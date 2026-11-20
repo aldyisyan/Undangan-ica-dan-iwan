@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { SECTION_PAD, WEDDING, WRAP } from "../lib/data";
+import { useAdminConfig } from "../lib/adminSettings";
+import SaveToCalendar from "../components/SaveToCalendar";
 import {
   HeartDoodle,
   IconArrow,
@@ -212,6 +214,7 @@ function EventCard({
 
 export default function DateEvents() {
   const c = useCountdown();
+  const cfg = useAdminConfig();
 
   return (
     <>
@@ -300,20 +303,44 @@ export default function DateEvents() {
           </div>
 
           <Reveal delay={120} className="mt-14 text-center">
-            <p className="font-hand text-3xl text-ink">{WEDDING.venue}</p>
+            <p className="font-hand text-3xl text-ink">{cfg.venue || WEDDING.venue}</p>
             <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-ink/60">
-              {WEDDING.address}
+              {cfg.address || WEDDING.address}
             </p>
-            <a
-              href={WEDDING.maps}
-              target="_blank"
-              rel="noreferrer"
-              className="group mt-7 inline-flex items-center gap-2.5 border border-ink/30 bg-paper px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-terra hover:text-terra"
-            >
-              <IconMap className="h-4 w-4" />
-              View Google Maps
-            </a>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <a
+                href={cfg.mapsUrl || WEDDING.maps}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2.5 border border-ink/30 bg-paper px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-terra hover:text-terra"
+              >
+                <IconMap className="h-4 w-4" />
+                View Google Maps
+              </a>
+              <SaveToCalendar compact />
+            </div>
           </Reveal>
+
+          {/* Maps Embed */}
+          {cfg.showMapsEmbed && cfg.mapsEmbed && (
+            <Reveal delay={180} className="mt-10">
+              <div className="relative overflow-hidden" style={{ paddingBottom: "56.25%", height: 0 }}>
+                <iframe
+                  src={cfg.mapsEmbed}
+                  title="Lokasi Venue"
+                  className="absolute inset-0 h-full w-full border-0"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </Reveal>
+          )}
+
+          {/* Save to Calendar */}
+          <div className="mt-14">
+            <SaveToCalendar />
+          </div>
         </div>
       </section>
     </>

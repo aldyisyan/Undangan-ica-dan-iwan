@@ -7,6 +7,7 @@ import Gallery from "./sections/Gallery";
 import Opening from "./sections/Opening";
 import Rsvp from "./sections/Rsvp";
 import Story from "./sections/Story";
+import VoiceNote from "./components/VoiceNote";
 import AdminPage from "./pages/AdminPage";
 import { getCloudRead, saveCloudRead, saveCloudAdmin, getCloudAdmin, decodeCloudParam, resolveCloudFromRef } from "./lib/cloudConfig";
 import { pullFromCloud } from "./lib/cloud";
@@ -185,6 +186,13 @@ export default function App() {
         {cfg.showStory && <Story showDressCode={cfg.showDressCode} />}
         {!cfg.showStory && cfg.showDressCode && <Story showDressCode={true} />}
         {cfg.showGallery && <Gallery />}
+        {cfg.showVoiceNote && cfg.voiceNoteEnabled && (
+          <section className="py-16 sm:py-20">
+            <div className={`mx-auto w-full max-w-5xl px-6 sm:px-8 xl:max-w-6xl xl:pl-52 xl:pr-12`}>
+              <VoiceNote />
+            </div>
+          </section>
+        )}
         <Rsvp
           showRsvp={cfg.showRsvp}
           showGifts={cfg.showGifts}
