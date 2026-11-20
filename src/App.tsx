@@ -8,6 +8,7 @@ import Opening from "./sections/Opening";
 import Rsvp from "./sections/Rsvp";
 import Story from "./sections/Story";
 import VoiceNote from "./components/VoiceNote";
+import FloatingAccents from "./components/FloatingAccents";
 import AdminPage from "./pages/AdminPage";
 import { getCloudRead, saveCloudRead, saveCloudAdmin, getCloudAdmin, decodeCloudParam, resolveCloudFromRef } from "./lib/cloudConfig";
 import { pullFromCloud } from "./lib/cloud";
@@ -90,6 +91,7 @@ export default function App() {
   return (
     <div className="relative min-h-screen bg-paper text-ink antialiased">
       <div className="paper-grain" aria-hidden />
+      <FloatingAccents />
 
       {/* sticky header */}
       <header className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${opened && scrolled ? "translate-y-0 border-b border-dashed border-ink/20 bg-paper/90 backdrop-blur-sm" : "-translate-y-full opacity-0"}`}>
