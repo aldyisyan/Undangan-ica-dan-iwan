@@ -32,13 +32,21 @@ export function getEventVisibilityFromURL(): EventVisibility {
   };
 }
 
-/** Bangun URL param visibilitas acara */
+/**
+ * Bangun URL param visibilitas acara.
+ *
+ * IMPORTANT FIX:
+ * Selalu tulis DUA parameter eksplisit (ea dan er),
+ * agar link tamu tidak pernah fallback secara ambigu ke setting global.
+ *
+ * Contoh:
+ * - akad + resepsi   => ea=1&er=1
+ * - resepsi saja     => ea=0&er=1
+ * - akad saja        => ea=1&er=0
+ * - sembunyikan dua2 => ea=0&er=0
+ */
 export function buildEventParams(showAkad: boolean, showResepsi: boolean): string {
-  const parts: string[] = [];
-  if (!showAkad) parts.push("ea=0");
-  if (!showResepsi) parts.push("er=0");
-  // jika keduanya true (default) → tidak perlu param tambahan
-  return parts.join("&");
+  return `ea=${showAkad ? 1 : 0}&er=${showResepsi ? 1 : 0}`;
 }
 
 /** Hook untuk membaca visibilitas acara secara reaktif */

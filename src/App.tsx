@@ -36,6 +36,8 @@ export default function App() {
 
   /* ---- cloud bootstrap ---- */
   useEffect(() => {
+    let timer: number | null = null;
+
     const boot = async () => {
       const combined = `${window.location.search}&${window.location.hash}`;
       const shortMatch = combined.match(/[?&]c=([^&#]+)/);
@@ -45,22 +47,52 @@ export default function App() {
         const existing = getCloudRead();
         if (!existing || !existing.anonKey) {
           const full = await resolveCloudFromRef(ref);
-          if (full) { saveCloudRead(full); if (full.anonKey && !getCloudAdmin()) saveCloudAdmin({ url: full.url, bucket: full.bucket, anonKey: full.anonKey }); }
-          else saveCloudRead({ url: `https://${ref}.supabase.co`, bucket: "invite" });
+          if (full) {
+            saveCloudRead(full);
+            if (full.anonKey && !getCloudAdmin()) saveCloudAdmin({ url: full.url, bucket: full.bucket, anonKey: full.anonKey });
+          } else {
+            saveCloudRead({ url: `https://${ref}.supabase.co`, bucket: "invite" });
+          }
         }
       } else if (longMatch) {
         const c = decodeCloudParam(longMatch[1]);
-        if (c) { saveCloudRead(c); if (c.anonKey && !getCloudAdmin()) saveCloudAdmin({ url: c.url, bucket: c.bucket, anonKey: c.anonKey }); }
+        if (c) {
+          saveCloudRead(c);
+          if (c.anonKey && !getCloudAdmin()) saveCloudAdmin({ url: c.url, bucket: c.bucket, anonKey: c.anonKey });
+        }
       }
+
+      // initial pull tetap boleh, termasuk di admin route
       if (getCloudRead()) await pullFromCloud().catch(() => {});
+
+      // IMPORTANT FIX:
+      // Saat admin sedang mengedit, jangan auto-pull berkala dari cloud
+      // karena bisa menimpa perubahan lokal yang baru dibuat dengan data cloud lama.
+      if (!isAdmin) {
+        timer = window.setInterval(() => {
+          if (getCloudRead()) pullFromCloud().catch(() => {});
+        }, 15_000);
+      }
     };
+
     boot();
-    const timer = window.setInterval(() => { if (getCloudRead()) pullFromCloud().catch(() => {}); }, 15_000);
-    const onVisible = () => { if (document.visibilityState === "visible" && getCloudRead()) pullFromCloud().catch(() => {}); };
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("focus", onVisible);
-    return () => { clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); window.removeEventListener("focus", onVisible); };
-  }, []);
+
+    const onVisible = () => {
+      if (isAdmin) return; // admin route tidak auto-pull saat fokus/visible
+      if (document.visibilityState === "visible" && getCloudRead()) pullFromCloud().catch(() => {});
+    };
+
+    if (!isAdmin) {
+      document.addEventListener("visibilitychange", onVisible);
+      window.addEventListener("focus", onVisible);
+    }
+
+    return () => {
+      if (timer !== null) clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
+  }, [isAdmin]);
 
   useEffect(() => { if (isAdmin) return; document.body.style.overflow = opened ? "" : "hidden"; return () => { document.body.style.overflow = ""; }; }, [opened, isAdmin]);
 
