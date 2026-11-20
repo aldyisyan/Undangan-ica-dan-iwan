@@ -19,7 +19,7 @@ export default function TabDanger() {
     clearGuestBook();
     clearCloudAdmin();
     resetAdminConfig();
-    sessionStorage.removeItem("admin-auth");
+    if (typeof window !== "undefined") sessionStorage.removeItem("admin-auth");
     setDone(true);
   };
 

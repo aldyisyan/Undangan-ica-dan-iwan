@@ -20,6 +20,7 @@ const ADMIN_KEY = "rk-cloud-admin";
 const LAST_KEY = "rk-cloud-last";
 
 function readLS<T>(key: string): T | null {
+  if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as T) : null;
@@ -30,15 +31,15 @@ function readLS<T>(key: string): T | null {
 
 export const getCloudRead = (): CloudRead | null => readLS<CloudRead>(READ_KEY);
 export const saveCloudRead = (cfg: CloudRead) =>
-  localStorage.setItem(READ_KEY, JSON.stringify(cfg));
+  typeof window !== "undefined" && localStorage.setItem(READ_KEY, JSON.stringify(cfg));
 
 export const getCloudAdmin = (): CloudAdmin | null => readLS<CloudAdmin>(ADMIN_KEY);
 export const saveCloudAdmin = (cfg: CloudAdmin) =>
-  localStorage.setItem(ADMIN_KEY, JSON.stringify(cfg));
-export const clearCloudAdmin = () => localStorage.removeItem(ADMIN_KEY);
+  typeof window !== "undefined" && localStorage.setItem(ADMIN_KEY, JSON.stringify(cfg));
+export const clearCloudAdmin = () => typeof window !== "undefined" && localStorage.removeItem(ADMIN_KEY);
 
-export const getLastSync = (): string | null => localStorage.getItem(LAST_KEY);
-export const setLastSync = (iso: string) => localStorage.setItem(LAST_KEY, iso);
+export const getLastSync = (): string | null => typeof window !== "undefined" ? localStorage.getItem(LAST_KEY) : null;
+export const setLastSync = (iso: string) => typeof window !== "undefined" && localStorage.setItem(LAST_KEY, iso);
 
 export function cloudObjectURL(cfg: CloudRead, path: string): string {
   return `${cfg.url}/storage/v1/object/public/${cfg.bucket}/${path}`;

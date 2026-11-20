@@ -33,8 +33,8 @@ export default function Opening({ guestName }: { guestName?: string | null }) {
 
   const groomPhoto = useMediaSrc(cfg.groomPhoto);
   const bridePhoto = useMediaSrc(cfg.bridePhoto);
-  const groomImg = groomPhoto || groomFallback;
-  const brideImg = bridePhoto || brideFallback;
+  const groomImg = groomPhoto || (typeof groomFallback === 'string' ? groomFallback : (groomFallback as any).src);
+  const brideImg = bridePhoto || (typeof brideFallback === 'string' ? brideFallback : (brideFallback as any).src);
 
   return (
     <>

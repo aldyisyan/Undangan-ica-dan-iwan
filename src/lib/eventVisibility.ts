@@ -35,9 +35,8 @@ export function getEventVisibilityFromURL(): EventVisibility {
 /** Bangun URL param visibilitas acara */
 export function buildEventParams(showAkad: boolean, showResepsi: boolean): string {
   const parts: string[] = [];
-  if (!showAkad) parts.push("ea=0");
-  if (!showResepsi) parts.push("er=0");
-  // jika keduanya true (default) → tidak perlu param tambahan
+  parts.push(`ea=${showAkad ? "1" : "0"}`);
+  parts.push(`er=${showResepsi ? "1" : "0"}`);
   return parts.join("&");
 }
 

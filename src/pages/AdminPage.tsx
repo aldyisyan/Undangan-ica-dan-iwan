@@ -27,7 +27,7 @@ const TABS = [
 type Tab = (typeof TABS)[number]["id"];
 
 export default function AdminPage() {
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem("admin-auth") === "1");
+  const [authed, setAuthed] = useState(() => typeof window !== "undefined" ? sessionStorage.getItem("admin-auth") === "1" : false);
   const [tab, setTab] = useState<Tab>("stats");
   const cfg = useAdminConfig();
 
@@ -68,7 +68,7 @@ export default function AdminPage() {
             </a>
             <button
               type="button"
-              onClick={() => { sessionStorage.removeItem("admin-auth"); setAuthed(false); }}
+              onClick={() => { if (typeof window !== "undefined") sessionStorage.removeItem("admin-auth"); setAuthed(false); }}
               className="text-[10px] font-semibold uppercase tracking-[0.2em] text-terra hover:underline"
             >
               Keluar

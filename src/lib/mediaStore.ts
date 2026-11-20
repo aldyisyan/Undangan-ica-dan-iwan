@@ -29,7 +29,7 @@ let _ver = 0;
 const _subs = new Set<() => void>();
 function bump() { _ver++; _subs.forEach((f) => f()); }
 function useVer(): number {
-  return useSyncExternalStore((cb) => { _subs.add(cb); return () => _subs.delete(cb); }, () => _ver);
+  return useSyncExternalStore((cb) => { _subs.add(cb); return () => _subs.delete(cb); }, () => _ver, () => _ver);
 }
 
 /* ---- blob URL cache ---- */
@@ -126,12 +126,15 @@ export async function resolveSrc(value: string): Promise<string> {
 }
 
 /** Reactive hook — re-resolves on every media save/delete */
-export function useMediaSrc(value?: string | null): string {
+export function useMediaSrc(value?: any): string {
   const ver = useVer();
   const [src, setSrc] = useState("");
   useEffect(() => {
     let alive = true;
     if (!value) setSrc("");
+    else if (typeof value !== "string") {
+        setSrc(value.src || "");
+    }
     else if (!isMediaRef(value)) setSrc(value);
     else resolveSrc(value).then((u) => { if (alive) setSrc(u); });
     return () => { alive = false; };

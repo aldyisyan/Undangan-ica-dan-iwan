@@ -21,7 +21,7 @@ export default function Cover({
 }) {
   const cfg = useAdminConfig();
   const adminHero = useMediaSrc(cfg.heroCoverPhoto);
-  const heroSrc = adminHero || coverFallback;
+  const heroSrc = adminHero || (typeof coverFallback === 'string' ? coverFallback : (coverFallback as any).src);
 
   return (
     <section
