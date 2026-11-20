@@ -1,6 +1,6 @@
 import { type FormEvent, useRef, useState } from "react";
 import {
-  useGuestBook, addGuest, removeGuest, markSent, clearGuestBook,
+  useGuestBook, addGuest, removeGuest, markSent, clearGuestBook, loadGuestBook,
   getWaTemplate, saveWaTemplate, buildInviteLink, buildWaUrl, renderWaMessage,
   normalizeWaPhone, DEFAULT_WA_TEMPLATE, setGuestEvents, type InviteGuest,
 } from "../../lib/guestBook";
@@ -35,16 +35,16 @@ function GuestRow({ g, cfg, onDelete, onSend, onCopy, showToast, pushCloud }: {
   const showResepsi = g.events?.showResepsi ?? cfg.globalShowResepsi;
 
   const toggleAkad = async () => {
-    setGuestEvents(g.id, { showAkad: !showAkad, showResepsi });
-    await pushCloud();
+    const next = setGuestEvents(g.id, { showAkad: !showAkad, showResepsi });
+    await pushCloud(next);
   };
   const toggleResepsi = async () => {
-    setGuestEvents(g.id, { showAkad, showResepsi: !showResepsi });
-    await pushCloud();
+    const next = setGuestEvents(g.id, { showAkad, showResepsi: !showResepsi });
+    await pushCloud(next);
   };
   const resetEvents = async () => {
-    setGuestEvents(g.id, { showAkad: cfg.globalShowAkad, showResepsi: cfg.globalShowResepsi });
-    await pushCloud();
+    const next = setGuestEvents(g.id, { showAkad: cfg.globalShowAkad, showResepsi: cfg.globalShowResepsi });
+    await pushCloud(next);
     showToast("Visibilitas direset ke default global.");
   };
 
@@ -124,25 +124,26 @@ export default function TabGuests() {
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3200); };
 
-  const pushCloud = async (list = guests) => {
+  const pushCloud = async (list?: InviteGuest[]) => {
     const admin = getCloudAdmin();
-    if (admin) await pushGuestBookToCloud(admin, list);
+    if (admin) await pushGuestBookToCloud(admin, list ?? loadGuestBook());
   };
 
   const add = async (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     addGuest(name, phone);
-    setName(""); setPhone("");
-    await pushCloud();
+    setName("");
+    setPhone("");
+    await pushCloud(loadGuestBook());
   };
 
   const del = async (id: string) => {
-    removeGuest(id);
-    await pushCloud(guests.filter((g) => g.id !== id));
+    const next = removeGuest(id);
+    await pushCloud(next);
   };
 
-  const send = (g: InviteGuest) => {
+  const send = async (g: InviteGuest) => {
     const ep = buildEventParams(
       g.events?.showAkad ?? cfg.globalShowAkad,
       g.events?.showResepsi ?? cfg.globalShowResepsi,
@@ -157,8 +158,8 @@ export default function TabGuests() {
     });
     const url = buildWaUrl(g.phone || "", msg);
     window.open(url, "_blank");
-    markSent(g.id);
-    pushCloud();
+    const next = markSent(g.id);
+    await pushCloud(next);
   };
 
   const pull = async () => {
@@ -224,7 +225,7 @@ export default function TabGuests() {
           <button type="button" onClick={exportXlsx} className="admin-btn">⬇ Export XLSX</button>
           <button type="button" onClick={() => fileRef.current?.click()} className="admin-btn">⬆ Import XLSX</button>
           <button type="button" onClick={pull} disabled={pulling} className="admin-btn">{pulling ? "…" : "⬇ Pull Cloud"}</button>
-          <button type="button" onClick={async () => { if (!confirm("Hapus semua?")) return; clearGuestBook(); await pushCloud([]); }} className="admin-btn-danger">Hapus Semua</button>
+          <button type="button" onClick={async () => { if (!confirm("Hapus semua?")) return; const next = clearGuestBook(); await pushCloud(next); }} className="admin-btn-danger">Hapus Semua</button>
         </div>
         <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden"
           onChange={(e) => { if (e.target.files?.[0]) importXlsx(e.target.files[0]); e.target.value = ""; }} />

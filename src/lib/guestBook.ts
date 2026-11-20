@@ -103,6 +103,15 @@ function load(): InviteGuest[] {
         phone: typeof g.phone === "string" ? g.phone : "",
         createdAt: typeof g.createdAt === "number" ? g.createdAt : Date.now(),
         sentAt: typeof g.sentAt === "number" ? g.sentAt : undefined,
+        events:
+          g.events && typeof g.events === "object"
+            ? {
+                showAkad:
+                  typeof g.events.showAkad === "boolean" ? g.events.showAkad : true,
+                showResepsi:
+                  typeof g.events.showResepsi === "boolean" ? g.events.showResepsi : true,
+              }
+            : undefined,
       }));
   } catch { return []; }
 }
@@ -137,15 +146,29 @@ export function addGuest(name: string, phone: string): InviteGuest {
   return guest;
 }
 
-export function removeGuest(id: string): void { commit(state.filter((g) => g.id !== id)); }
-export function markSent(id: string): void { commit(state.map((g) => (g.id === id ? { ...g, sentAt: Date.now() } : g))); }
-export function clearGuestBook(): void { commit([]); }
+export function removeGuest(id: string): InviteGuest[] {
+  const next = state.filter((g) => g.id !== id);
+  commit(next);
+  return next;
+}
+export function markSent(id: string): InviteGuest[] {
+  const next = state.map((g) => (g.id === id ? { ...g, sentAt: Date.now() } : g));
+  commit(next);
+  return next;
+}
+export function clearGuestBook(): InviteGuest[] {
+  const next: InviteGuest[] = [];
+  commit(next);
+  return next;
+}
 export function loadGuestBook(): InviteGuest[] { return state; }
 export function replaceGuestBookFromCloud(guests: InviteGuest[]): void { commit(guests); }
 
 /** Ubah visibilitas acara untuk tamu tertentu */
-export function setGuestEvents(id: string, events: GuestEventVisibility): void {
-  commit(state.map((g) => (g.id === id ? { ...g, events } : g)));
+export function setGuestEvents(id: string, events: GuestEventVisibility): InviteGuest[] {
+  const next = state.map((g) => (g.id === id ? { ...g, events } : g));
+  commit(next);
+  return next;
 }
 
 export function useGuestBook(): InviteGuest[] {
