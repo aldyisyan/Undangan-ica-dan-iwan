@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import closing from "../assets/closing.jpg";
-import { SECTION_PAD, WEDDING, WRAP } from "../lib/data";
+import { SECTION_PAD, WRAP } from "../lib/data";
+import { useAdminConfig } from "../lib/adminSettings";
 import { useWishes, addWish, type Wish } from "../lib/wishes";
 import { getCloudAdmin } from "../lib/cloudConfig";
 import { pushWishesToCloud } from "../lib/cloud";
@@ -38,6 +39,7 @@ export default function Rsvp({
   showGifts?: boolean;
   gifts?: GiftItem[];
 }) {
+  const cfg = useAdminConfig();
   const cloudWishes = useWishes();
   const [name, setName] = useState("");
   const [attend, setAttend] = useState<"Hadir" | "Tidak Hadir" | "Masih Ragu">("Hadir");
@@ -219,9 +221,9 @@ export default function Rsvp({
             <p className="mt-6 text-[15px] leading-[1.9] text-ink/75">
               Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak, Ibu, Saudara, dan Saudari berkenan hadir untuk memberikan doa restu.
             </p>
-            <p className="mt-6 font-note text-lg text-terra">Sampai jumpa di hari bahagia kami, {WEDDING.dateLabel}</p>
-            <p className="mt-8 font-hand text-5xl leading-none text-ink">Iwan <span className="text-terra">&amp;</span> Ica</p>
-            <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-navy/70">{WEDDING.fullLabel} &middot; {WEDDING.venue}</p>
+            <p className="mt-6 font-note text-lg text-terra">Sampai jumpa di hari bahagia kami, {cfg.weddingDateLabel}</p>
+            <p className="mt-8 font-hand text-5xl leading-none text-ink">{cfg.groomNick} <span className="text-terra">&amp;</span> {cfg.brideNick}</p>
+            <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-navy/70">{cfg.weddingDateLabel} &middot; {cfg.venue}</p>
           </Reveal>
         </div>
 
@@ -242,7 +244,7 @@ export default function Rsvp({
           <HeartDoodle className="heartbeat h-5 w-5 text-terra" filled />
           <p className="font-note text-[13px] text-ink/55">Dibuat dengan cinta &mdash; #IwanIcaForever</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <a href={`https://wa.me/?text=${encodeURIComponent(`Undangan Pernikahan Iwan & Ica — Sabtu, 21 November 2026. Kami menantikan kehadiran dan doa restu Anda. ${typeof window !== "undefined" ? window.location.href : ""}`)}`}
+            <a href={`https://wa.me/?text=${encodeURIComponent(`Undangan Pernikahan ${cfg.groomNick} & ${cfg.brideNick} — ${cfg.weddingDateLabel}. Kami menantikan kehadiran dan doa restu Anda. ${typeof window !== "undefined" ? window.location.href : ""}`)}`}
               target="_blank" rel="noreferrer"
               className="inline-flex items-center gap-2 border border-ink/25 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-terra hover:text-terra">
               <HeartDoodle className="h-3.5 w-3.5" filled />Bagikan via WhatsApp

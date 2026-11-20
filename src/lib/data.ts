@@ -5,8 +5,8 @@ import gal1 from "../assets/gal-1.jpg";
 import gal2 from "../assets/gal-2.jpg";
 import gal3 from "../assets/gal-3.jpg";
 
-/** Kontainer standar: terpusat, tapi bergeser ke kanan pada xl agar tidak menabrak rel margin. */
-export const WRAP = "mx-auto w-full max-w-5xl px-6 sm:px-8 xl:max-w-6xl xl:pl-52 xl:pr-12";
+/** Kontainer standar: terpusat. */
+export const WRAP = "mx-auto w-full max-w-4xl px-6 sm:px-8";
 
 export const SECTION_PAD = "py-24 sm:py-32";
 

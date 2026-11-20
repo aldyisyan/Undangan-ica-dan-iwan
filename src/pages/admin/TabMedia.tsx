@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
 import { getCloudAdmin } from "../../lib/cloudConfig";
 import { syncToCloud } from "../../lib/cloud";
-import { saveMedia, mediaRef } from "../../lib/mediaStore";
+import { saveMedia, mediaRef, useMediaSrc as useMediaSrcHook } from "../../lib/mediaStore";
 import MediaUpload from "./MediaUpload";
 
 export default function TabMedia() {
@@ -183,9 +183,7 @@ export default function TabMedia() {
 }
 
 function GalleryThumb({ src, onRemove }: { src: string; onRemove: () => void }) {
-  const { useMediaSrc } = require("../../lib/mediaStore");
-  // We use a simple img with direct src resolution
-  const resolved = useMediaSrc(src);
+  const resolved = useMediaSrcHook(src);
   return (
     <div className="relative aspect-[4/5] overflow-hidden bg-paper2 group">
       {resolved && <img src={resolved} alt="" className="h-full w-full object-cover" />}
