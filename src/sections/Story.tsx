@@ -7,7 +7,7 @@ function StoryVisual({ item }: { item: any }) {
       <div className="polaroid relative mx-auto w-full max-w-[290px] rotate-[-2.5deg] p-3 pb-9 transition-transform duration-500 hover:rotate-0 md:mx-0">
         <span className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden />
         <div className="aspect-[4/5] overflow-hidden bg-paper2">
-          <img src={typeof item.img === 'string' ? item.img : (item.img as any).src} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
+          <img src={item.img} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
         </div>
         <p className="mt-3 text-center font-note text-sm text-terra">{item.caption}</p>
       </div>

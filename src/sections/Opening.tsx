@@ -1,5 +1,5 @@
-import brideFallback from "@/assets/bride.jpg";
-import groomFallback from "@/assets/groom.jpg";
+const brideFallback = "/images/bride.jpg";
+const groomFallback = "/images/groom.jpg";
 import { SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
@@ -33,8 +33,8 @@ export default function Opening({ guestName }: { guestName?: string | null }) {
 
   const groomPhoto = useMediaSrc(cfg.groomPhoto);
   const bridePhoto = useMediaSrc(cfg.bridePhoto);
-  const groomImg = groomPhoto || (typeof groomFallback === 'string' ? groomFallback : (groomFallback as any).src);
-  const brideImg = bridePhoto || (typeof brideFallback === 'string' ? brideFallback : (brideFallback as any).src);
+  const groomImg = groomPhoto || groomFallback;
+  const brideImg = bridePhoto || brideFallback;
 
   return (
     <>

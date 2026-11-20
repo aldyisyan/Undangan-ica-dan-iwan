@@ -5,7 +5,7 @@ import { useMediaSrc } from "../lib/mediaStore";
 import { HeartDoodle, IconArrow, IconClose, Reveal, SectionHead } from "../lib/ui";
 
 /** Resolve a single admin gallery photo */
-function GalleryItem({ src, caption, ratio, idx, onOpen }: { src: any; caption: string; ratio: string; idx: number; onOpen: (i: number) => void }) {
+function GalleryItem({ src, caption, ratio, idx, onOpen }: { src: string; caption: string; ratio: string; idx: number; onOpen: (i: number) => void }) {
   const resolved = useMediaSrc(src);
   if (!resolved) return null;
   return (

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import coverFallback from "../assets/cover.jpg";
+const coverFallback = "/images/cover.jpg";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
 import { HeartDoodle, OvalButton, Reveal } from "../lib/ui";
@@ -21,7 +21,7 @@ export default function Cover({
 }) {
   const cfg = useAdminConfig();
   const adminHero = useMediaSrc(cfg.heroCoverPhoto);
-  const heroSrc = adminHero || (typeof coverFallback === 'string' ? coverFallback : (coverFallback as any).src);
+  const heroSrc = adminHero || coverFallback;
 
   return (
     <section
