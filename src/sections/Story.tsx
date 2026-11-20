@@ -1,7 +1,7 @@
 import { DRESS_SWATCHES, SECTION_PAD, STORY, WRAP } from "../lib/data";
 import { HeartDoodle, Reveal, RoughFrame, SectionHead, Sprig } from "../lib/ui";
 
-function StoryVisual({ item }: { item: any }) {
+function StoryVisual({ item }: { item: (typeof STORY)[number] }) {
   if (item.img) {
     return (
       <div className="polaroid relative mx-auto w-full max-w-[290px] rotate-[-2.5deg] p-3 pb-9 transition-transform duration-500 hover:rotate-0 md:mx-0">

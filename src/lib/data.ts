@@ -1,9 +1,9 @@
-const story1 = "/images/story-1.jpg";
-const story2 = "/images/story-2.jpg";
-const story3 = "/images/story-3.jpg";
-const gal1 = "/images/gal-1.jpg";
-const gal2 = "/images/gal-2.jpg";
-const gal3 = "/images/gal-3.jpg";
+import story1 from "../assets/story-1.jpg";
+import story2 from "../assets/story-2.jpg";
+import story3 from "../assets/story-3.jpg";
+import gal1 from "../assets/gal-1.jpg";
+import gal2 from "../assets/gal-2.jpg";
+import gal3 from "../assets/gal-3.jpg";
 
 /** Kontainer standar: terpusat. */
 export const WRAP = "mx-auto w-full max-w-4xl px-6 sm:px-8";

@@ -9,6 +9,9 @@ import Rsvp from "./sections/Rsvp";
 import Story from "./sections/Story";
 import VoiceNote from "./components/VoiceNote";
 import FloatingAccents from "./components/FloatingAccents";
+import AdminPage from "./pages/AdminPage";
+import { getCloudRead, saveCloudRead, saveCloudAdmin, getCloudAdmin, decodeCloudParam, resolveCloudFromRef } from "./lib/cloudConfig";
+import { pullFromCloud } from "./lib/cloud";
 import { useAdminConfig } from "./lib/adminSettings";
 
 function useGuestParam() {
@@ -16,7 +19,13 @@ function useGuestParam() {
   return new URLSearchParams(window.location.search).get("to")?.trim() || null;
 }
 
+function useIsAdmin() {
+  const hash = typeof window !== "undefined" ? window.location.hash : "";
+  return hash === "#admin" || hash.startsWith("#admin?") || hash === "#/admin";
+}
+
 export default function App() {
+  const isAdmin = useIsAdmin();
   const guestParam = useGuestParam();
   const cfg = useAdminConfig();
 
@@ -25,25 +34,43 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  /* ---- redirect hash admin to /admin ---- */
+  /* ---- cloud bootstrap ---- */
   useEffect(() => {
-    if (window.location.hash.startsWith("#admin") || window.location.hash.startsWith("#/admin")) {
-        window.location.href = "/admin";
-    }
+    const boot = async () => {
+      const combined = `${window.location.search}&${window.location.hash}`;
+      const shortMatch = combined.match(/[?&]c=([^&#]+)/);
+      const longMatch = combined.match(/[?&]cloud=([^&#]+)/);
+      if (shortMatch) {
+        const ref = decodeURIComponent(shortMatch[1]).trim();
+        const existing = getCloudRead();
+        if (!existing || !existing.anonKey) {
+          const full = await resolveCloudFromRef(ref);
+          if (full) { saveCloudRead(full); if (full.anonKey && !getCloudAdmin()) saveCloudAdmin({ url: full.url, bucket: full.bucket, anonKey: full.anonKey }); }
+          else saveCloudRead({ url: `https://${ref}.supabase.co`, bucket: "invite" });
+        }
+      } else if (longMatch) {
+        const c = decodeCloudParam(longMatch[1]);
+        if (c) { saveCloudRead(c); if (c.anonKey && !getCloudAdmin()) saveCloudAdmin({ url: c.url, bucket: c.bucket, anonKey: c.anonKey }); }
+      }
+      if (getCloudRead()) await pullFromCloud().catch(() => {});
+    };
+    boot();
+    const timer = window.setInterval(() => { if (getCloudRead()) pullFromCloud().catch(() => {}); }, 15_000);
+    const onVisible = () => { if (document.visibilityState === "visible" && getCloudRead()) pullFromCloud().catch(() => {}); };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => { clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); window.removeEventListener("focus", onVisible); };
   }, []);
 
-  useEffect(() => { 
-    document.body.style.overflow = opened ? "" : "hidden"; 
-    return () => { document.body.style.overflow = ""; }; 
-  }, [opened]);
+  useEffect(() => { if (isAdmin) return; document.body.style.overflow = opened ? "" : "hidden"; return () => { document.body.style.overflow = ""; }; }, [opened, isAdmin]);
 
   useEffect(() => {
-    if (!opened) return;
+    if (!opened || isAdmin) return;
     const onScroll = () => setScrolled(window.scrollY > 200);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [opened]);
+  }, [opened, isAdmin]);
 
   useEffect(() => () => disposeMusic(), []);
 
@@ -58,6 +85,8 @@ export default function App() {
   const toggleMusic = useCallback(async () => {
     try { setPlaying(await music.toggle()); } catch { setPlaying(false); }
   }, []);
+
+  if (isAdmin) return <AdminPage />;
 
   return (
     <div className="relative min-h-screen bg-paper text-ink antialiased">

@@ -1,9 +1,8 @@
 import { useState, type FormEvent } from "react";
-const closing = "/images/closing.jpg";
+import closing from "../assets/closing.jpg";
 import { SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useWishes, addWish, type Wish } from "../lib/wishes";
-import { useEventVisibility } from "../lib/eventVisibility";
 import { getCloudAdmin } from "../lib/cloudConfig";
 import { pushWishesToCloud } from "../lib/cloud";
 import {
@@ -42,10 +41,7 @@ export default function Rsvp({
 }) {
   const cfg = useAdminConfig();
   const cloudWishes = useWishes();
-  const ev = useEventVisibility();
-  
-  const guestName = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("to") : "";
-  const [name, setName] = useState(guestName || "");
+  const [name, setName] = useState("");
   const [attend, setAttend] = useState<"Hadir" | "Tidak Hadir" | "Masih Ragu">("Hadir");
   const [guestCount, setGuestCount] = useState(2);
   const [message, setMessage] = useState("");
@@ -103,13 +99,8 @@ export default function Rsvp({
               <Reveal>
                 <form onSubmit={submit} className="relative bg-paper px-6 py-8 sm:px-8">
                   <RoughFrame stroke="rgba(30,27,24,0.5)" />
-<p className="font-hand text-3xl leading-none text-ink">
-  Apakah Anda akan hadir
-  {ev.showAkad && ev.showResepsi ? " di Akad & Resepsi?" : ev.showAkad ? " di Akad Nikah?" : ev.showResepsi ? " di Resepsi Pernikahan?" : "?"}
-</p>
-<p className="mt-2 text-[13px] leading-relaxed text-ink/60">
-  Konfirmasi kehadiran Anda sangat berarti bagi kami untuk menyiapkan tempat terbaik bagi Anda.
-</p>
+                  <p className="font-hand text-3xl leading-none text-ink">Apakah Anda akan hadir?</p>
+                  <p className="mt-2 text-[13px] leading-relaxed text-ink/60">Mohon konfirmasi sebelum 14 November 2026 agar kami dapat menyiapkan tempat terbaik untuk Anda.</p>
 
                   <label className="mt-7 block text-[10px] font-semibold uppercase tracking-[0.28em] text-navy/75">Nama Lengkap</label>
                   <input value={name} onChange={(e) => { setName(e.target.value); if (error) setError(""); }}
@@ -238,9 +229,9 @@ export default function Rsvp({
 
         <div className="mx-auto mt-12 w-full max-w-lg px-6 sm:max-w-2xl">
           <Reveal className="relative">
-<div className="relative aspect-[3/2] overflow-hidden bg-paper2">
-  <img src={closing} alt="Ilustrasi Iwan dan Ica berjalan beriringan pulang" className="h-full w-full object-cover" loading="lazy" />
-</div>
+            <div className="relative aspect-[3/2] overflow-hidden bg-paper2">
+              <img src={closing} alt="Ilustrasi Iwan dan Ica berjalan beriringan pulang" className="h-full w-full object-cover" loading="lazy" />
+            </div>
             <svg className="pointer-events-none absolute inset-0 h-full w-full text-ink/70" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none" aria-hidden>
               <path d="M6 8C80 4 200 10 294 6c3 54-2 134 1 187-85 4-175-2-288 2C3 140 9 60 6 8Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
             </svg>

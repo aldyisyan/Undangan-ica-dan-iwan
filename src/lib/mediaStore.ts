@@ -29,7 +29,7 @@ let _ver = 0;
 const _subs = new Set<() => void>();
 function bump() { _ver++; _subs.forEach((f) => f()); }
 function useVer(): number {
-  return useSyncExternalStore((cb) => { _subs.add(cb); return () => _subs.delete(cb); }, () => _ver, () => _ver);
+  return useSyncExternalStore((cb) => { _subs.add(cb); return () => _subs.delete(cb); }, () => _ver);
 }
 
 /* ---- blob URL cache ---- */

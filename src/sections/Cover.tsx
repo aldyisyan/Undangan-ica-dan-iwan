@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-const coverFallback = "/images/cover.jpg";
+import coverFallback from "../assets/cover.jpg";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
 import { HeartDoodle, OvalButton, Reveal } from "../lib/ui";

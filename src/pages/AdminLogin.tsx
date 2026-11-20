@@ -10,7 +10,7 @@ export default function AdminLogin({ onLogin }: { onLogin: () => void }) {
     e.preventDefault();
     const cfg = getAdminConfig();
     if (pin === cfg.adminPin) {
-      if (typeof window !== "undefined") sessionStorage.setItem("admin-auth", "1");
+      sessionStorage.setItem("admin-auth", "1");
       onLogin();
     } else {
       setError("PIN salah. Coba lagi.");

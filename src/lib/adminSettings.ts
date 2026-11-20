@@ -128,25 +128,7 @@ const DEFAULT: AdminConfig = {
 
 const STORAGE_KEY = "rk-admin-config-v1";
 
-async function fetchSettings() {
-  try {
-    const res = await fetch("/api/settings");
-    if (res.ok) {
-      const data = await res.json();
-      if (Object.keys(data).length > 0) {
-        _state = { ...DEFAULT, ...data };
-        emit();
-      }
-    }
-  } catch (e) { console.error(e); }
-}
-
-if (typeof window !== "undefined") {
-  fetchSettings();
-}
-
 function loadConfig(): AdminConfig {
-  if (typeof window === "undefined") return { ...DEFAULT };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { ...DEFAULT };
@@ -165,41 +147,26 @@ function emit() { _listeners.forEach((l) => l()); }
 export function getAdminConfig(): AdminConfig { return _state; }
 
 export function saveAdminConfig(next: Partial<AdminConfig>): void {
-  const newState = { ..._state, ...next };
-  _state = newState;
-  if (typeof window !== "undefined") {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); } catch { /* ignore */ }
-  }
+  _state = { ..._state, ...next };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); } catch { /* ignore */ }
   emit();
-
-  // Async push to DB
-  fetch("/api/settings", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(next)
-  }).catch(console.error);
 }
 
 export function replaceAdminSettings(remote: Record<string, unknown>): void {
   _state = { ...DEFAULT, ...(_state), ...(remote as Partial<AdminConfig>) };
-  if (typeof window !== "undefined") {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); } catch { /* ignore */ }
-  }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); } catch { /* ignore */ }
   emit();
 }
 
 export function resetAdminConfig(): void {
   _state = { ...DEFAULT };
-  if (typeof window !== "undefined") {
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
-  }
+  try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   emit();
 }
 
 export function useAdminConfig(): AdminConfig {
   return useSyncExternalStore(
     (cb) => { _listeners.add(cb); return () => _listeners.delete(cb); },
-    () => _state,
     () => _state
   );
 }
