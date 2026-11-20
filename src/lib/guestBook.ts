@@ -1,12 +1,20 @@
 import { useSyncExternalStore } from "react";
 import { encodeCloudParam } from "./cloudConfig";
 
+/** Acara mana yang bisa dilihat tamu ini */
+export interface GuestEventVisibility {
+  showAkad: boolean;
+  showResepsi: boolean;
+}
+
 export interface InviteGuest {
   id: string;
   name: string;
   phone: string;
   createdAt: number;
   sentAt?: number;
+  /** Override visibilitas acara untuk tamu ini. Jika undefined → ikut setting global admin. */
+  events?: GuestEventVisibility;
 }
 
 const KEY = "rk-invite-guestbook-v1";
@@ -40,13 +48,18 @@ export function saveWaTemplate(tpl: string): void {
   try { localStorage.setItem(TPL_KEY, tpl); } catch { /* ignore */ }
 }
 
-export function buildInviteLink(name: string): string {
+export function buildInviteLink(name: string, eventParams?: string): string {
   const base = `${window.location.origin}${window.location.pathname}`;
   const params = new URLSearchParams();
   const trimmed = name.trim();
   if (trimmed) params.set("to", trimmed);
   const ref = encodeCloudParam();
   if (ref) params.set("c", ref);
+  if (eventParams) {
+    // parse eventParams ("ea=0&er=1") dan tambahkan ke params
+    const ep = new URLSearchParams(eventParams);
+    ep.forEach((v, k) => params.set(k, v));
+  }
   const q = params.toString();
   return q ? `${base}?${q}` : base;
 }
@@ -129,6 +142,11 @@ export function markSent(id: string): void { commit(state.map((g) => (g.id === i
 export function clearGuestBook(): void { commit([]); }
 export function loadGuestBook(): InviteGuest[] { return state; }
 export function replaceGuestBookFromCloud(guests: InviteGuest[]): void { commit(guests); }
+
+/** Ubah visibilitas acara untuk tamu tertentu */
+export function setGuestEvents(id: string, events: GuestEventVisibility): void {
+  commit(state.map((g) => (g.id === id ? { ...g, events } : g)));
+}
 
 export function useGuestBook(): InviteGuest[] {
   return useSyncExternalStore(

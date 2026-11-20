@@ -15,6 +15,13 @@ export interface AdminConfig {
   showSaveCalendar: boolean;
   showMapsEmbed: boolean;
 
+  /**
+   * Visibilitas acara secara GLOBAL (default untuk semua tamu).
+   * Bisa di-override per tamu di tab Tamu.
+   */
+  globalShowAkad: boolean;
+  globalShowResepsi: boolean;
+
   /** Data rekening/amplop digital */
   gifts: { bank: string; number: string; holder: string; kind: string }[];
   kadoAddress: string;
@@ -73,6 +80,8 @@ const DEFAULT: AdminConfig = {
   showVoiceNote: false,
   showSaveCalendar: true,
   showMapsEmbed: false,
+  globalShowAkad: true,
+  globalShowResepsi: true,
 
   gifts: [
     { bank: "BCA", number: "1234567890", holder: "Ica Lestari", kind: "Rekening Tabungan" },

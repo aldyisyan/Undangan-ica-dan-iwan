@@ -47,13 +47,12 @@ export function Reveal({
 /* ------------------------------------------------------------ section head */
 
 export function SectionHead({
-  num,
   kicker,
   title,
   aside,
   align = "center",
 }: {
-  num: string;
+  num?: string;
   kicker: string;
   title: string;
   aside?: string;
@@ -63,14 +62,6 @@ export function SectionHead({
   return (
     <Reveal className={center ? "text-center" : "text-left"}>
       <div className={`relative ${center ? "inline-block" : ""}`}>
-        <span
-          aria-hidden
-          className={`pointer-events-none absolute -top-6 select-none font-hand text-[4.2rem] leading-none text-terra/25 sm:-top-8 sm:text-[5.5rem] ${
-            center ? "-right-1 rotate-6 sm:-right-14" : "-left-4 -top-10 -rotate-6"
-          }`}
-        >
-          {num}
-        </span>
         <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-navy/70">{kicker}</p>
         <h2 className="mt-2 font-hand text-[clamp(2.4rem,7vw,3.6rem)] leading-[1.05] text-ink">{title}</h2>
         <svg

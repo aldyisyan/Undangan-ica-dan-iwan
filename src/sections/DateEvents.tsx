@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
+import { useEventVisibility } from "../lib/eventVisibility";
 import SaveToCalendar from "../components/SaveToCalendar";
 import {
   HeartDoodle,
@@ -102,6 +103,7 @@ function EventCard({ data, rotate }: { data: { title: string; time: string; plac
 
 export default function DateEvents() {
   const cfg = useAdminConfig();
+  const ev = useEventVisibility();
   const weddingDate = useMemo(() => new Date(cfg.weddingDate), [cfg.weddingDate]);
   const c = useCountdown(cfg.weddingDate);
 
@@ -146,10 +148,18 @@ export default function DateEvents() {
         <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 border-b border-dashed border-ink/20" />
         <div className={WRAP}>
           <SectionHead num="04" kicker="Lokasi & Waktu" title="Rangkaian Acara" />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2">
-            <Reveal><EventCard data={akad} rotate="sm:-rotate-1" /></Reveal>
-            <Reveal delay={200}><EventCard data={resepsi} rotate="sm:rotate-1" /></Reveal>
-          </div>
+
+          {/* tampilkan sesuai visibilitas per tamu */}
+          {!ev.showAkad && !ev.showResepsi ? (
+            <Reveal className="mt-10 text-center">
+              <p className="font-note text-sm text-ink/50">Detail acara akan diinformasikan lebih lanjut.</p>
+            </Reveal>
+          ) : (
+            <div className={`mt-12 grid gap-6 ${ev.showAkad && ev.showResepsi ? "sm:grid-cols-2" : ""}`}>
+              {ev.showAkad && <Reveal><EventCard data={akad} rotate={ev.showResepsi ? "sm:-rotate-1" : ""} /></Reveal>}
+              {ev.showResepsi && <Reveal delay={ev.showAkad ? 200 : 0}><EventCard data={resepsi} rotate={ev.showAkad ? "sm:rotate-1" : ""} /></Reveal>}
+            </div>
+          )}
 
           <Reveal delay={120} className="mt-12 text-center">
             <p className="font-hand text-3xl text-ink">{cfg.venue}</p>
