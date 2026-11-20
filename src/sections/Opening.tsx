@@ -1,5 +1,5 @@
-import brideFallback from "../assets/bride.jpg";
-import groomFallback from "../assets/groom.jpg";
+import brideFallback from "@/assets/bride.jpg";
+import groomFallback from "@/assets/groom.jpg";
 import { SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
