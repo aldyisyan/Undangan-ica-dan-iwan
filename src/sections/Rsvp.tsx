@@ -21,6 +21,9 @@ interface GiftItem { bank: string; number: string; holder: string; kind: string;
 
 const STATUS_OPTIONS = ["Hadir", "Tidak Hadir", "Masih Ragu"] as const;
 
+/** Batas jumlah tamu per undangan. */
+const MAX_GUESTS = 2;
+
 function statusChip(attend: string) {
   if (attend === "hadir" || attend === "Hadir") return "border-terra/60 bg-terra/10 text-terra";
   if (attend === "tidak" || attend === "Tidak Hadir") return "border-ink/25 bg-ink/5 text-ink/60";
@@ -45,8 +48,9 @@ export default function Rsvp({
   const closingPhoto = useMediaSrc(cfg.closingPhoto);
   const [name, setName] = useState("");
   const [attend, setAttend] = useState<"Hadir" | "Tidak Hadir" | "Masih Ragu">("Hadir");
-  const [guestCount, setGuestCount] = useState(2);
+  const [guestCount, setGuestCount] = useState(MAX_GUESTS);
   const [message, setMessage] = useState("");
+  const [withoutMsg, setWithoutMsg] = useState(false);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
 
@@ -64,14 +68,16 @@ export default function Rsvp({
       name: name.trim(),
       attend: attendMap[attend] ?? "hadir",
       count: attend === "Hadir" ? guestCount : 0,
-      message: message.trim() || "Selamat menempuh hidup baru, Iwan & Ica!",
+      // "Hadir tanpa ucapan" → sengaja dikirim kosong, bukan pesan bawaan.
+      message: withoutMsg ? "" : message.trim(),
       at: Date.now(),
     };
     addWish(wish);
     const admin = getCloudAdmin();
     if (admin) await pushWishesToCloud(admin, [wish, ...cloudWishes]);
-    setName(""); setMessage(""); setGuestCount(2); setAttend("Hadir");
-    showToast("Terima kasih, ucapan Anda tersimpan ♥");
+    const wasWithout = withoutMsg;
+    setName(""); setMessage(""); setGuestCount(MAX_GUESTS); setAttend("Hadir"); setWithoutMsg(false);
+    showToast(wasWithout ? "Terima kasih, konfirmasi kehadiran Anda tersimpan ♥" : "Terima kasih, ucapan Anda tersimpan ♥");
   };
 
   const copy = async (text: string, label: string) => {
@@ -79,8 +85,7 @@ export default function Rsvp({
     catch {
       const ta = document.createElement("textarea");
       ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-      document.body.appendChild(ta); ta.select(); document.execCommand("copy");
-      document.body.removeChild(ta);
+      document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
     }
     showToast(`${label} berhasil disalin ✓`);
   };
@@ -129,20 +134,59 @@ export default function Rsvp({
                       &minus;
                     </button>
                     <span className="w-24 text-center font-hand text-3xl text-ink tabular">{attend === "Hadir" ? guestCount : 0} orang</span>
-                    <button type="button" disabled={attend !== "Hadir" || guestCount >= 10} onClick={() => setGuestCount((g) => Math.min(10, g + 1))}
+                    <button type="button" disabled={attend !== "Hadir" || guestCount >= MAX_GUESTS} onClick={() => setGuestCount((g) => Math.min(MAX_GUESTS, g + 1))}
                       className="grid h-10 w-10 place-items-center rounded-full border border-ink/25 text-lg leading-none text-ink transition hover:border-terra hover:text-terra disabled:cursor-not-allowed">
                       +
                     </button>
+                    <span className="text-[11px] leading-tight text-ink/45">maks. {MAX_GUESTS} orang<br />per undangan</span>
                   </div>
 
-                  <label className="mt-7 block text-[10px] font-semibold uppercase tracking-[0.28em] text-navy/75">Ucapan &amp; Doa</label>
-                  <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3}
-                    placeholder="Tuliskan doa terbaik Anda…"
-                    className="mt-2 w-full resize-none border-b border-ink/25 bg-transparent py-2.5 text-[15px] text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-terra" />
+                  {/* ---- opsi hadir tanpa ucapan ---- */}
+                  <button
+                    type="button"
+                    onClick={() => setWithoutMsg((v) => !v)}
+                    aria-pressed={withoutMsg}
+                    disabled={attend !== "Hadir"}
+                    className={`mt-7 inline-flex w-full items-center gap-3 border px-4 py-3 text-left transition-all duration-300 disabled:opacity-40 ${
+                      withoutMsg ? "border-terra bg-terra/10" : "border-dashed border-ink/25 bg-paper hover:border-terra/60"
+                    }`}
+                  >
+                    <span
+                      aria-hidden
+                      className={`grid h-5 w-5 shrink-0 place-items-center border transition-colors ${
+                        withoutMsg ? "border-terra bg-terra text-paper" : "border-ink/30 bg-paper"
+                      }`}
+                    >
+                      {withoutMsg && <IconCheck className="h-3.5 w-3.5" />}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[12px] font-semibold uppercase tracking-[0.16em] text-ink">
+                        Hadir tanpa ucapan
+                      </span>
+                      <span className="mt-0.5 block text-[12px] leading-snug text-ink/55">
+                        Cukup konfirmasi kehadiran — tanpa menulis doa dan pesan.
+                      </span>
+                    </span>
+                  </button>
+
+                  {!withoutMsg ? (
+                    <>
+                      <label className="mt-7 block text-[10px] font-semibold uppercase tracking-[0.28em] text-navy/75">Ucapan &amp; Doa</label>
+                      <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3}
+                        placeholder="Tuliskan doa terbaik Anda…"
+                        className="mt-2 w-full resize-none border-b border-ink/25 bg-transparent py-2.5 text-[15px] text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-terra" />
+                    </>
+                  ) : (
+                    <p className="mt-7 border border-dashed border-ink/20 bg-paper2/60 px-4 py-3.5 text-[13px] leading-relaxed text-ink/55">
+                      Konfirmasi kehadiran tanpa ucapan. Doa restu Anda sudah lebih dari cukup bagi kami ♥
+                    </p>
+                  )}
 
                   {error && <p className="mt-3 font-note text-sm text-terra">{error}</p>}
                   <div className="mt-8 flex justify-center">
-                    <OvalButton type="submit" tone="terra">Kirim Ucapan</OvalButton>
+                    <OvalButton type="submit" tone="terra">
+                      {withoutMsg ? "Kirim Konfirmasi" : "Kirim Ucapan"}
+                    </OvalButton>
                   </div>
                 </form>
               </Reveal>
@@ -164,7 +208,11 @@ export default function Rsvp({
                           {attendLabel(w.attend)}{w.count ? ` · ${w.count}` : ""}
                         </span>
                       </div>
-                      <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink/75">{w.message}</p>
+                      {w.message ? (
+                        <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink/75">{w.message}</p>
+                      ) : (
+                        <p className="mt-2.5 font-note text-[13px] italic text-ink/45">Hadir tanpa ucapan</p>
+                      )}
                       <p className="mt-2.5 font-note text-[11px] uppercase tracking-[0.14em] text-ink/55">
                         {new Date(w.at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                       </p>
@@ -213,7 +261,7 @@ export default function Rsvp({
         </section>
       )}
 
-      {/* ---- 09 · penutup ---- */}
+      {/* ---- penutup ---- */}
       <section id="penutup" className={`${SECTION_PAD} relative overflow-hidden pb-16`}>
         <div className={WRAP}>
           <Reveal className="mx-auto max-w-2xl text-center">
@@ -223,7 +271,7 @@ export default function Rsvp({
               Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak, Ibu, Saudara, dan Saudari berkenan hadir untuk memberikan doa restu.
             </p>
             <p className="mt-6 font-note text-lg text-terra">Sampai jumpa di hari bahagia kami, {cfg.weddingDateLabel}</p>
-            <p className="mt-8 font-hand text-5xl leading-none text-ink">{cfg.groomNick} <span className="text-terra">&amp;</span> {cfg.brideNick}</p>
+            <p className="mt-8 font-hand text-5xl leading-none text-ink">{cfg.brideNick} <span className="text-terra">&amp;</span> {cfg.groomNick}</p>
             <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-navy/70">{cfg.weddingDateLabel} &middot; {cfg.venue}</p>
           </Reveal>
         </div>
@@ -250,7 +298,7 @@ export default function Rsvp({
           <HeartDoodle className="heartbeat h-5 w-5 text-terra" filled />
           <p className="font-note text-[13px] text-ink/55">Dibuat dengan cinta &mdash; #IwanIcaForever</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <a href={`https://wa.me/?text=${encodeURIComponent(`Undangan Pernikahan ${cfg.groomNick} & ${cfg.brideNick} — ${cfg.weddingDateLabel}. Kami menantikan kehadiran dan doa restu Anda. ${typeof window !== "undefined" ? window.location.href : ""}`)}`}
+            <a href={`https://wa.me/?text=${encodeURIComponent(`Undangan Pernikahan ${cfg.brideNick} & ${cfg.groomNick} — ${cfg.weddingDateLabel}. Kami menantikan kehadiran dan doa restu Anda. ${typeof window !== "undefined" ? window.location.href : ""}`)}`}
               target="_blank" rel="noreferrer"
               className="inline-flex items-center gap-2 border border-ink/25 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-terra hover:text-terra">
               <HeartDoodle className="h-3.5 w-3.5" filled />Bagikan via WhatsApp

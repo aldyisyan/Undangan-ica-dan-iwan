@@ -71,7 +71,11 @@ export default function TabWishes() {
                     {label(w.attend)}{w.count ? ` · ${w.count} orang` : ""}
                   </span>
                 </div>
-                <p className="mt-2 text-[13px] leading-relaxed text-ink/75">{w.message}</p>
+                {w.message ? (
+                  <p className="mt-2 text-[13px] leading-relaxed text-ink/75">{w.message}</p>
+                ) : (
+                  <p className="mt-2 font-note text-[13px] italic text-ink/45">Hadir tanpa ucapan</p>
+                )}
                 <p className="mt-1.5 text-[11px] text-ink/40">{new Date(w.at).toLocaleString("id-ID")}</p>
               </div>
               <button type="button" onClick={() => del(w)} className="shrink-0 self-start text-[11px] font-semibold text-terra hover:underline">Hapus</button>

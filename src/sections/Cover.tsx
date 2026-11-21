@@ -47,7 +47,7 @@ export default function Cover({
           </p>
 
           <h1 className="mt-3 font-hand text-[clamp(2.4rem,12vw,4.8rem)] font-semibold leading-[0.9] text-ink">
-            {cfg.groomNick} <span className="text-terra">&amp;</span> {cfg.brideNick}
+            {cfg.brideNick} <span className="text-terra">&amp;</span> {cfg.groomNick}
           </h1>
 
           <svg
@@ -79,7 +79,7 @@ export default function Cover({
                 />
               </div>
               <p className="mt-2 text-center font-note text-xs text-ink/50">
-                {cfg.groomNick} & {cfg.brideNick}
+                {cfg.brideNick} & {cfg.groomNick}
               </p>
             </div>
             <HeartDoodle className="drift absolute -right-3 -top-2 h-6 w-6 text-terra/60" />
