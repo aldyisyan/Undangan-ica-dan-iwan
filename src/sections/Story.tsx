@@ -68,8 +68,9 @@ export default function Story({
 }: {
   showDressCode?: boolean;
 }) {
-  void showDressCode; // suppress unused warning, used in JSX below
+  void showDressCode;
   const cfg = useAdminConfig();
+
   return (
     <>
       {/* ------------------------------------------------- 05 · cerita */}

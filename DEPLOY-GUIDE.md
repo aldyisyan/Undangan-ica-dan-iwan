@@ -1,4 +1,5 @@
 # 🚀 Panduan Deploy: GitHub → Vercel → Supabase
+**Version 2.5 (Update 2.5.x)**
 
 Panduan lengkap untuk push project undangan digital ke GitHub,
 deploy otomatis di Vercel, dan menghubungkan ke Supabase Cloud Sync.

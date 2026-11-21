@@ -312,6 +312,159 @@ export const IconArrow = ({ className = "h-5 w-5" }: IconProps) => (
 
 /* ------------------------------------------------------------- margin rail */
 
+/* ============================================================
+   SCRAPBOOK ORNAMENT COMPONENTS
+   ============================================================ */
+
+/** Potongan amplop segitiga di pojok — dekorasi murni */
+export function EnvelopeFlap({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 60" fill="none" className={className} aria-hidden>
+      <path d="M0 0h120L60 60Z" fill="currentColor" opacity=".12" />
+      <path d="M0 0h120L60 60Z" stroke="currentColor" strokeWidth="1" opacity=".35" strokeLinejoin="round" />
+      <path d="M4 2l112 0" stroke="currentColor" strokeWidth=".6" opacity=".2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Pita pelangi horizontal bergaya sticker */
+export function RibbonBand({
+  text,
+  tone = "terra",
+  className = "",
+}: {
+  text: string;
+  tone?: "terra" | "navy" | "sage" | "nude";
+  className?: string;
+}) {
+  const bg: Record<string, string> = {
+    terra: "rgba(181,83,60,.14)",
+    navy: "rgba(44,62,99,.12)",
+    sage: "rgba(125,132,113,.14)",
+    nude: "rgba(231,211,190,.55)",
+  };
+  const col: Record<string, string> = {
+    terra: "rgba(181,83,60,.8)",
+    navy: "rgba(44,62,99,.75)",
+    sage: "rgba(125,132,113,.85)",
+    nude: "rgba(30,27,24,.55)",
+  };
+  return (
+    <div
+      className={`relative overflow-hidden py-2 text-center ${className}`}
+      style={{ background: bg[tone] }}
+      aria-hidden
+    >
+      <span
+        className="font-note text-[10px] uppercase tracking-[0.38em]"
+        style={{ color: col[tone] }}
+      >
+        {text}
+      </span>
+      {/* serrated left */}
+      <svg className="absolute inset-y-0 left-0 h-full w-3" viewBox="0 0 12 60" preserveAspectRatio="none" fill="var(--color-paper)" aria-hidden>
+        <path d="M12 0C9 5 12 10 9 15s3 10 0 15 3 10 0 15 3 10 0 15V0Z" />
+      </svg>
+      {/* serrated right */}
+      <svg className="absolute inset-y-0 right-0 h-full w-3" viewBox="0 0 12 60" preserveAspectRatio="none" fill="var(--color-paper)" aria-hidden>
+        <path d="M0 0c3 5 0 10 3 15s-3 10 0 15-3 10 0 15-3 10 0 15V0Z" />
+      </svg>
+    </div>
+  );
+}
+
+/** Tiket bergigi — ornamen pembatas */
+export function TicketDivider({ className = "" }: { className?: string }) {
+  return (
+    <div className={`relative flex items-center gap-3 ${className}`} aria-hidden>
+      <div className="flex-1 border-t border-dashed border-ink/20" />
+      <svg viewBox="0 0 48 24" className="h-5 w-10 text-terra/60" fill="none">
+        <rect x="1" y="1" width="46" height="22" rx="3" stroke="currentColor" strokeWidth="1.2" strokeDasharray="3 2" />
+        <circle cx="11" cy="12" r="3" stroke="currentColor" strokeWidth="1" />
+        <circle cx="24" cy="12" r="3" stroke="currentColor" strokeWidth="1" />
+        <circle cx="37" cy="12" r="3" stroke="currentColor" strokeWidth="1" />
+      </svg>
+      <div className="flex-1 border-t border-dashed border-ink/20" />
+    </div>
+  );
+}
+
+/** Hiasan bunga / kembang empat kelopak — aksen pojok */
+export function FloretMark({
+  className = "h-6 w-6 text-terra/40",
+}: {
+  className?: string;
+}) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <ellipse cx="12" cy="6" rx="3.5" ry="5.5" opacity=".9" />
+      <ellipse cx="12" cy="18" rx="3.5" ry="5.5" opacity=".9" />
+      <ellipse cx="6" cy="12" rx="5.5" ry="3.5" opacity=".9" />
+      <ellipse cx="18" cy="12" rx="5.5" ry="3.5" opacity=".9" />
+      <circle cx="12" cy="12" r="3" fill="var(--color-paper)" />
+    </svg>
+  );
+}
+
+/** Ampersand bergaya tangan */
+export function HandAmpersand({ className = "h-16 text-ink/8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 60 80" fill="none" className={className} aria-hidden>
+      <path
+        d="M42 62c-14 8-32 2-32-14 0-10 7-16 16-20L14 16c-4-5-2-12 6-13 7-1 12 5 10 12l-6 10c8 4 20 11 18 23"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M28 36c8 6 18 12 18 22 0 8-7 14-16 14-6 0-12-3-16-8"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/** Tiga titik tulisan tangan vertikal */
+export function PenDots({ className = "text-terra/40" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 12 36" className={`h-8 w-3 ${className}`} fill="currentColor" aria-hidden>
+      <circle cx="6" cy="4" r="2.2" />
+      <circle cx="6" cy="18" r="2.2" />
+      <circle cx="6" cy="32" r="2.2" />
+    </svg>
+  );
+}
+
+/** Bintang sketsa — hiasan pojok / sidebar */
+export function StarSketch({ className = "h-8 w-8 text-terra/30" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden>
+      <path
+        d="M16 2l3.5 9.5H30l-8.5 6 3 9.5L16 22l-8.5 5 3-9.5L2 11.5h10.5Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Tanaman ranting bercabang — pojok bawah section */
+export function TwigLeft({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 80 120" fill="none" className={className} aria-hidden>
+      <path d="M40 115V30" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M40 85c-18-3-28-16-26-32 18 3 28 16 26 32Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+      <path d="M40 65c14-3 24-16 22-30-14 3-24 16-22 30Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+      <path d="M40 48c-12-2-20-13-18-26 12 2 20 13 18 26Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" opacity=".65" />
+      <path d="M40 34c10-2 16-12 14-23-10 2-16 12-14 23Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" opacity=".45" />
+    </svg>
+  );
+}
+
 export type RailItem = { id: string; num: string; label: string };
 
 export function MarginRail({ items, active }: { items: RailItem[]; active: string }) {

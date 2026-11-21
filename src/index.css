@@ -50,6 +50,160 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
 }
 
+/* ══════════════════════════════════════════════════
+   SCRAPBOOK DECORATIONS — section backgrounds
+   ══════════════════════════════════════════════════ */
+
+/* Kertas bergaris — section salam & mempelai */
+.bg-ruled {
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 31px,
+      rgba(44, 62, 99, 0.065) 31px,
+      rgba(44, 62, 99, 0.065) 32px
+    );
+  background-size: 100% 32px;
+}
+
+/* Kertas kotak-kotak halus — section hitung mundur */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(44,62,99,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44,62,99,.045) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Kertas titik-titik — section cerita */
+.bg-dots {
+  background-image: radial-gradient(rgba(30,27,24,.1) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Tepi robek atas (torn paper) */
+.torn-top::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 100%;
+  height: 18px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 20' preserveAspectRatio='none'%3E%3Cpath d='M0 12c50-8 90 10 140 2s80-14 130-4 70 12 110 2 90-16 140-4 80 14 120 4 70-12 110-4 80 12 120 2 70-14 110-4 80 14 120 4V20H0Z' fill='%23FDFBF7'/%3E%3C/svg%3E")
+    center / cover;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Tepi robek bawah (torn paper) */
+.torn-bot::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 18px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 20' preserveAspectRatio='none'%3E%3Cpath d='M0 8c50 8 90-10 140-2s80 14 130 4 70-12 110-4 90 16 140 4 80-14 120-4 70 12 110 4 80-12 120-2 70 14 110 4 80-14 120-4V0H0Z' fill='%23FDFBF7'/%3E%3C/svg%3E")
+    center / cover;
+  pointer-events: none;
+  z-index: 2;
+}
+.torn-top, .torn-bot { position: relative; overflow: visible; }
+
+/* Pita horizontal (marquee note) */
+@keyframes marquee-band {
+  to { transform: translateX(-50%); }
+}
+.band-marquee {
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+.band-marquee__inner {
+  display: inline-flex;
+  gap: 3rem;
+  white-space: nowrap;
+  animation: marquee-band 36s linear infinite;
+}
+.band-marquee__inner span {
+  font-family: var(--font-note);
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(44,62,99,.55);
+}
+
+/* Cap amplop — pojok kanan bawah surat */
+.envelope-seal {
+  position: absolute;
+  bottom: -1.1rem;
+  right: 2.5rem;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 9999px;
+  border: 1.5px dashed rgba(181,83,60,.7);
+  display: grid;
+  place-items: center;
+  background: rgba(253,251,247,.85);
+  box-shadow: 0 1px 6px rgba(30,27,24,.12);
+  transform: rotate(-10deg);
+  z-index: 4;
+}
+.envelope-seal::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(181,83,60,.35);
+}
+
+/* Label amplop — pojok kiri atas */
+.stamp-label {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  border: 1.5px solid rgba(44,62,99,.35);
+  padding: 3px 10px 4px;
+  font-family: var(--font-note);
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(44,62,99,.65);
+  z-index: 3;
+}
+
+/* Linen section: benang silang diagonal */
+.bg-linen {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(181,83,60,.028) 0, rgba(181,83,60,.028) 1px, transparent 1px, transparent 50%),
+    repeating-linear-gradient(-45deg, rgba(181,83,60,.028) 0, rgba(181,83,60,.028) 1px, transparent 1px, transparent 50%);
+  background-size: 18px 18px;
+}
+
+/* Coretan pensil ringan di sekitar konten */
+.pencil-box {
+  position: relative;
+}
+.pencil-box::before,
+.pencil-box::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-radius: 2px;
+  opacity: 0.5;
+}
+.pencil-box::before {
+  inset: -4px -6px;
+  border: 1px solid rgba(30,27,24,.18);
+  transform: rotate(-0.4deg);
+}
+.pencil-box::after {
+  inset: -7px -9px;
+  border: 1px solid rgba(30,27,24,.1);
+  transform: rotate(0.6deg);
+}
+
 /* ---------- scroll reveal ---------- */
 .reveal {
   opacity: 0;

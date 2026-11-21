@@ -76,7 +76,6 @@ export default function Opening({ guestName }: { guestName?: string | null }) {
           <SectionHead num="02" kicker="The Bride & Groom" title="Mempelai" />
 
           <div className="mt-14 grid gap-14 sm:grid-cols-2 sm:gap-8">
-            {/* Susunan mempelai: wanita dahulu, baru pria */}
             <Reveal delay={80}>
               <PortraitCard
                 img={brideImg}

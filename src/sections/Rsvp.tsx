@@ -20,8 +20,6 @@ import {
 interface GiftItem { bank: string; number: string; holder: string; kind: string; }
 
 const STATUS_OPTIONS = ["Hadir", "Tidak Hadir", "Masih Ragu"] as const;
-
-/** Batas jumlah tamu per undangan. */
 const MAX_GUESTS = 2;
 
 function statusChip(attend: string) {
@@ -68,7 +66,6 @@ export default function Rsvp({
       name: name.trim(),
       attend: attendMap[attend] ?? "hadir",
       count: attend === "Hadir" ? guestCount : 0,
-      // "Hadir tanpa ucapan" → sengaja dikirim kosong, bukan pesan bawaan.
       message: withoutMsg ? "" : message.trim(),
       at: Date.now(),
     };
@@ -90,9 +87,10 @@ export default function Rsvp({
     showToast(`${label} berhasil disalin ✓`);
   };
 
+  const visibleWishes = cloudWishes.filter((w) => w.message.trim().length > 0);
+
   return (
     <>
-      {/* ---- 08 · rsvp ---- */}
       {showRsvp && (
         <section id="rsvp" className={`${SECTION_PAD} relative bg-paper2/70`}>
           <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 border-t border-dashed border-ink/20" />
@@ -102,7 +100,6 @@ export default function Rsvp({
             <SectionHead num="08" kicker="RSVP & Amplop Digital" title="Konfirmasi Kehadiran" aside="satu klik, satu doa" />
 
             <div className="mt-16 grid gap-12 lg:grid-cols-2 lg:gap-10">
-              {/* form */}
               <Reveal>
                 <form onSubmit={submit} className="relative bg-paper px-6 py-8 sm:px-8">
                   <RoughFrame stroke="rgba(30,27,24,0.5)" />
@@ -141,7 +138,6 @@ export default function Rsvp({
                     <span className="text-[11px] leading-tight text-ink/45">maks. {MAX_GUESTS} orang<br />per undangan</span>
                   </div>
 
-                  {/* ---- opsi hadir tanpa ucapan ---- */}
                   <button
                     type="button"
                     onClick={() => setWithoutMsg((v) => !v)}
@@ -191,17 +187,15 @@ export default function Rsvp({
                 </form>
               </Reveal>
 
-              {/* ucapan + amplop */}
               <Reveal delay={140} className="flex flex-col">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-navy/75">Doa dari Tamu</p>
                 <p className="mt-2 font-hand text-3xl text-ink">Ucapan yang masuk</p>
 
                 <ul className="no-scrollbar mt-6 max-h-[520px] space-y-4 overflow-y-auto pr-1">
-                  {/* Hanya ucapan berisi doa yang ditampilkan; RSVP tanpa pesan tidak masuk daftar. */}
-                  {cloudWishes.filter((w) => w.message.trim().length > 0).length === 0 && (
+                  {visibleWishes.length === 0 && (
                     <li className="text-sm text-ink/50">Jadilah yang pertama menuliskan doa dan ucapan ♥</li>
                   )}
-                  {cloudWishes.filter((w) => w.message.trim().length > 0).map((w, i) => (
+                  {visibleWishes.map((w, i) => (
                     <li key={`${w.name}-${i}`} className="border border-dashed border-ink/25 bg-paper px-5 py-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="font-hand text-2xl leading-none text-ink">{w.name}</p>
@@ -209,11 +203,7 @@ export default function Rsvp({
                           {attendLabel(w.attend)}{w.count ? ` · ${w.count}` : ""}
                         </span>
                       </div>
-                      {w.message ? (
-                        <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink/75">{w.message}</p>
-                      ) : (
-                        <p className="mt-2.5 font-note text-[13px] italic text-ink/45">Hadir tanpa ucapan</p>
-                      )}
+                      <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink/75">{w.message}</p>
                       <p className="mt-2.5 font-note text-[11px] uppercase tracking-[0.14em] text-ink/55">
                         {new Date(w.at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                       </p>
@@ -221,7 +211,6 @@ export default function Rsvp({
                   ))}
                 </ul>
 
-                {/* amplop digital */}
                 {showGifts && gifts.length > 0 && (
                   <div className="mt-10">
                     <div className="flex items-center gap-3">
@@ -262,7 +251,6 @@ export default function Rsvp({
         </section>
       )}
 
-      {/* ---- penutup ---- */}
       <section id="penutup" className={`${SECTION_PAD} relative overflow-hidden pb-16`}>
         <div className={WRAP}>
           <Reveal className="mx-auto max-w-2xl text-center">

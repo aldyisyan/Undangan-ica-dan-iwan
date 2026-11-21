@@ -1,3 +1,8 @@
+/**
+ * RK-INVITE v2.5
+ * Undangan pernikahan digital (Ica & Iwan)
+ * Fitur: Scrapbook gallery, auto-sync Supabase, RSVP override
+ */
 import { useCallback, useEffect, useState } from "react";
 import { disposeMusic, music, setMusicStateListener, syncMusicSource } from "./lib/music";
 import { useMediaSrc } from "./lib/mediaStore";

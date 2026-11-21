@@ -5,7 +5,7 @@ import {
   normalizeWaPhone, DEFAULT_WA_TEMPLATE, setGuestEvents, type InviteGuest,
 } from "../../lib/guestBook";
 import { getCloudAdmin } from "../../lib/cloudConfig";
-import { pushGuestBookToCloud, pullFromCloud } from "../../lib/cloud";
+import { pushGuestBookToCloud, forceReplaceGuestBookCloud, pullFromCloud } from "../../lib/cloud";
 import { useAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
 import { buildEventParams } from "../../lib/eventVisibility";
 import { useWishes, hasResponded } from "../../lib/wishes";
@@ -143,6 +143,11 @@ export default function TabGuests() {
     if (admin) await pushGuestBookToCloud(admin, list ?? loadGuestBook());
   };
 
+  const forcePushCloud = async (list: InviteGuest[]) => {
+    const admin = getCloudAdmin();
+    if (admin) await forceReplaceGuestBookCloud(admin, list);
+  };
+
   const add = async (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -154,7 +159,7 @@ export default function TabGuests() {
 
   const del = async (id: string) => {
     const next = removeGuest(id);
-    await pushCloud(next);
+    await forcePushCloud(next);
   };
 
   const send = async (g: InviteGuest) => {
@@ -239,7 +244,7 @@ export default function TabGuests() {
           <button type="button" onClick={exportXlsx} className="admin-btn">⬇ Export XLSX</button>
           <button type="button" onClick={() => fileRef.current?.click()} className="admin-btn">⬆ Import XLSX</button>
           <button type="button" onClick={pull} disabled={pulling} className="admin-btn">{pulling ? "…" : "⬇ Pull Cloud"}</button>
-          <button type="button" onClick={async () => { if (!confirm("Hapus semua?")) return; const next = clearGuestBook(); await pushCloud(next); }} className="admin-btn-danger">Hapus Semua</button>
+          <button type="button" onClick={async () => { if (!confirm("Hapus semua?")) return; const next = clearGuestBook(); await forcePushCloud(next); }} className="admin-btn-danger">Hapus Semua</button>
         </div>
         <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden"
           onChange={(e) => { if (e.target.files?.[0]) importXlsx(e.target.files[0]); e.target.value = ""; }} />

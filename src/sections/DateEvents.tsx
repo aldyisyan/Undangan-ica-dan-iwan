@@ -105,7 +105,6 @@ function EventCard({ data, rotate }: { data: { title: string; time: string; plac
 export default function DateEvents() {
   const cfg = useAdminConfig();
   const ev = useEventVisibility();
-  /* visual yang bisa di-switch ke foto dari admin */
   const calendarPhoto = useMediaSrc(cfg.calendarPhoto);
   const mapsPhoto = useMediaSrc(cfg.mapsPhoto);
   const weddingDate = useMemo(() => new Date(cfg.weddingDate), [cfg.weddingDate]);
@@ -146,7 +145,6 @@ export default function DateEvents() {
                 </div>
               )}
             </Reveal>
-            {/* Sakelar visual: foto (di-upload di tab Media) bila ada, else kalender grid */}
             <Reveal delay={160}>
               {calendarPhoto ? (
                 <figure className="polaroid relative mx-auto w-full max-w-[320px] p-3 pb-8 md:mx-0">
@@ -178,7 +176,6 @@ export default function DateEvents() {
         <div className={WRAP}>
           <SectionHead num="04" kicker="Lokasi & Waktu" title="Rangkaian Acara" />
 
-          {/* tampilkan sesuai visibilitas per tamu */}
           {!ev.showAkad && !ev.showResepsi ? (
             <Reveal className="mt-10 text-center">
               <p className="font-note text-sm text-ink/50">Detail acara akan diinformasikan lebih lanjut.</p>
@@ -202,7 +199,6 @@ export default function DateEvents() {
             </div>
           </Reveal>
 
-          {/* Sakelar visual peta: foto (bila ada) → embed → hanya tombol */}
           {mapsPhoto ? (
             <Reveal delay={180} className="mt-10">
               <figure className="relative overflow-hidden border border-ink/15 bg-paper">

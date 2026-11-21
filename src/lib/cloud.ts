@@ -38,16 +38,51 @@ function mergeWishes(local: Wish[], remote: Wish[]): Wish[] {
   const seen = new Set<string>();
   const merged: Wish[] = [];
   const key = (w: Wish) => `${w.name.trim().toLowerCase()}|${w.at}`;
-  for (const w of remote) { const k = key(w); if (!seen.has(k)) { seen.add(k); merged.push(w); } }
-  for (const w of local)  { const k = key(w); if (!seen.has(k)) { seen.add(k); merged.push(w); } }
+  
+  // 1. Ambil semua dari remote (cloud adalah sumber kebenaran)
+  for (const w of remote) {
+    const k = key(w);
+    if (!seen.has(k)) { seen.add(k); merged.push(w); }
+  }
+  
+  // 2. Tambahkan dari lokal HANYA JIKA belum ada di remote DAN sangat baru (dibuat < 2 jam lalu).
+  // Jika usianya sudah lama tapi tidak ada di remote, berarti sudah dihapus admin (mencegah zombie data).
+  const TWO_HOURS = 2 * 60 * 60 * 1000;
+  const now = Date.now();
+  for (const w of local) {
+    const k = key(w);
+    if (!seen.has(k) && now - w.at < TWO_HOURS) {
+      seen.add(k);
+      merged.push(w);
+    }
+  }
+  
   merged.sort((a, b) => b.at - a.at);
   return merged;
 }
 
 function mergeGuests(local: InviteGuest[], remote: InviteGuest[]): InviteGuest[] {
   const map = new Map<string, InviteGuest>();
+  
+  // 1. Ambil semua dari remote
   for (const g of remote) map.set(g.id, g);
-  for (const g of local)  map.set(g.id, { ...(map.get(g.id) ?? g), ...g });
+  
+  // 2. Gabungkan dengan lokal.
+  // Jika di lokal ada tamu yang tidak ada di remote, pertahankan HANYA JIKA baru dibuat (< 2 jam).
+  // Jika sudah lama, berarti admin telah menghapusnya dari cloud (mencegah zombie).
+  const TWO_HOURS = 2 * 60 * 60 * 1000;
+  const now = Date.now();
+  for (const g of local) {
+    if (map.has(g.id)) {
+      // jika ada di keduanya, ambil properti terbaru (misal: sentAt atau events)
+      // utamakan data lokal yang lebih rich, tapi tidak masalah karena cloud juga di-update admin.
+      map.set(g.id, { ...g, ...map.get(g.id)! });
+    } else if (now - g.createdAt < TWO_HOURS) {
+      // tamu lokal baru (belum masuk cloud CDN cache) -> pertahankan
+      map.set(g.id, g);
+    }
+  }
+  
   return [...map.values()].sort((a, b) => a.createdAt - b.createdAt);
 }
 
@@ -131,6 +166,10 @@ export async function pushGuestBookToCloud(admin: CloudAdmin, guests: InviteGues
     new Blob([JSON.stringify(merged)], { type: "application/json" }), "application/json; charset=utf-8");
   if (ok) replaceGuestBookFromCloud(merged);
   return ok;
+}
+
+export async function forceReplaceGuestBookCloud(admin: CloudAdmin, guests: InviteGuest[]): Promise<boolean> {
+  return uploadObject(admin, "site/guests.json", new Blob([JSON.stringify(guests)], { type: "application/json" }), "application/json; charset=utf-8");
 }
 
 export async function forceReplaceWishesCloud(admin: CloudAdmin, wishes: Wish[]): Promise<boolean> {

@@ -1,17 +1,10 @@
-/**
- * Floating botanical/heart accents on left & right sides.
- * Uses CSS animations for parallax-like 3D movement effect.
- */
-
 const ITEMS = [
-  // LEFT side
   { side: "left", top: "8%",  delay: 0,    dur: 18, size: 28, type: "leaf",  rotate: -15 },
   { side: "left", top: "22%", delay: 3,    dur: 22, size: 20, type: "heart", rotate: 10 },
   { side: "left", top: "38%", delay: 1.5,  dur: 20, size: 32, type: "sprig", rotate: -8 },
   { side: "left", top: "55%", delay: 5,    dur: 24, size: 18, type: "heart", rotate: 20 },
   { side: "left", top: "68%", delay: 2,    dur: 19, size: 26, type: "leaf",  rotate: -25 },
   { side: "left", top: "82%", delay: 4,    dur: 21, size: 22, type: "dot",   rotate: 0 },
-  // RIGHT side
   { side: "right", top: "5%",  delay: 2,   dur: 20, size: 24, type: "sprig", rotate: 12 },
   { side: "right", top: "18%", delay: 0,   dur: 23, size: 18, type: "heart", rotate: -10 },
   { side: "right", top: "35%", delay: 4,   dur: 18, size: 30, type: "leaf",  rotate: 20 },
@@ -43,7 +36,6 @@ function Svg({ type, size }: { type: string; size: number }) {
       <path d="M12 10c-5-.5-8-4-9-9 5 .5 8 4 9 9Z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" opacity="0.6" />
     </svg>
   );
-  // dot
   return (
     <svg width={s * 0.4} height={s * 0.4} viewBox="0 0 10 10">
       <circle cx="5" cy="5" r="3" stroke="currentColor" strokeWidth="1.2" fill="none" />
@@ -95,7 +87,6 @@ export default function FloatingAccents() {
           60% { transform: translate3d(7px, -24px, 0) rotate(calc(var(--r, 0deg) + 6deg)); }
         }
         @media (max-width: 768px) {
-          /* hide on small screens — too distracting */
           .pointer-events-none.fixed.inset-0.z-10 > div { opacity: 0.4; }
         }
         @media (max-width: 480px) {
