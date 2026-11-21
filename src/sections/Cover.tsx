@@ -14,10 +14,12 @@ export default function Cover({
   opened,
   burst,
   onOpen,
+  guestName,
 }: {
   opened: boolean;
   burst: boolean;
   onOpen: () => void;
+  guestName?: string | null;
 }) {
   const cfg = useAdminConfig();
   const adminHero = useMediaSrc(cfg.heroCoverPhoto);
@@ -28,7 +30,6 @@ export default function Cover({
       id="cover"
       className="relative flex h-[100svh] flex-col items-center justify-center overflow-hidden px-6"
     >
-      {/* background image with overlay */}
       <div className="absolute inset-0 z-0">
         <img
           src={heroSrc}
@@ -39,7 +40,6 @@ export default function Cover({
         <div className="absolute inset-0 bg-paper/80" />
       </div>
 
-      {/* content — all in one screen */}
       <div className="relative z-10 mx-auto w-full max-w-lg text-center">
         <Reveal>
           <p className="text-[9px] font-semibold uppercase tracking-[0.5em] text-navy/70 sm:text-[11px]">
@@ -68,7 +68,14 @@ export default function Cover({
             {cfg.weddingDateLabel}
           </p>
 
-          {/* hero image — compact polaroid */}
+          {/* Nama tamu sekarang tampil sejak layar pembuka */}
+          <div className="mt-5 inline-flex max-w-full flex-col items-center border border-dashed border-ink/20 bg-paper/70 px-5 py-3 backdrop-blur-sm">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.24em] text-navy/65">Kepada Yth.</p>
+            <p className="mt-1 break-words font-hand text-[clamp(1.6rem,5vw,2.2rem)] leading-tight text-ink">
+              {guestName || "Bapak / Ibu / Saudara / i"}
+            </p>
+          </div>
+
           <div className="relative mx-auto mt-6 w-full max-w-[280px] sm:max-w-[320px]">
             <div className="polaroid p-2 pb-6">
               <div className="aspect-[4/3] overflow-hidden bg-paper2">
@@ -86,7 +93,6 @@ export default function Cover({
             <HeartDoodle className="drift absolute -left-2 bottom-4 h-5 w-5 text-navy/50" />
           </div>
 
-          {/* button */}
           <div className="mt-6">
             {opened ? (
               <a
@@ -105,7 +111,6 @@ export default function Cover({
         </Reveal>
       </div>
 
-      {/* heart burst */}
       {burst && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[30%] z-20 h-0" aria-hidden>
           {BURST.map((b, i) => (

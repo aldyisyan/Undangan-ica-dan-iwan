@@ -3,7 +3,7 @@
  * Undangan pernikahan digital (Ica & Iwan)
  * Fitur: Scrapbook gallery, auto-sync Supabase, RSVP override
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { disposeMusic, music, setMusicStateListener, syncMusicSource } from "./lib/music";
 import { useMediaSrc } from "./lib/mediaStore";
 import { IconMusic } from "./lib/ui";
@@ -19,10 +19,11 @@ import AdminPage from "./pages/AdminPage";
 import { getCloudRead, saveCloudRead, saveCloudAdmin, getCloudAdmin, decodeCloudParam, resolveCloudFromRef } from "./lib/cloudConfig";
 import { pullFromCloud } from "./lib/cloud";
 import { useAdminConfig } from "./lib/adminSettings";
+import { getGuestNameParam, useGuestFromUrl } from "./lib/guestBook";
 
-function useGuestParam() {
-  if (typeof window === "undefined") return null;
-  return new URLSearchParams(window.location.search).get("to")?.trim() || null;
+function useGuestDisplayName() {
+  const guestRecord = useGuestFromUrl();
+  return useMemo(() => guestRecord?.name || getGuestNameParam(), [guestRecord]);
 }
 
 function useIsAdmin() {
@@ -32,7 +33,7 @@ function useIsAdmin() {
 
 export default function App() {
   const isAdmin = useIsAdmin();
-  const guestParam = useGuestParam();
+  const guestName = useGuestDisplayName();
   const cfg = useAdminConfig();
   const resolvedMusicUrl = useMediaSrc(cfg.musicSrc);
 
@@ -72,8 +73,6 @@ export default function App() {
       if (getCloudRead()) await pullFromCloud().catch(() => {});
 
       if (!isAdmin) {
-        // Poll every 20s — pullFromCloud is serialised internally,
-        // so overlapping calls are safely no-ops.
         timer = window.setInterval(() => {
           if (getCloudRead()) pullFromCloud().catch(() => {});
         }, 20_000);
@@ -99,7 +98,6 @@ export default function App() {
     };
   }, [isAdmin]);
 
-  /* ---- sinkronkan perubahan musik kustom secara reaktif ---- */
   useEffect(() => {
     setMusicStateListener((nextPlaying) => setPlaying(nextPlaying));
     return () => setMusicStateListener(null);
@@ -158,7 +156,6 @@ export default function App() {
       <div className="paper-grain" aria-hidden />
       <FloatingAccents />
 
-      {/* sticky header */}
       <header
         className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${opened && scrolled ? "translate-y-0 border-b border-dashed border-ink/20 bg-paper/90 backdrop-blur-sm" : "-translate-y-full opacity-0"}`}
       >
@@ -171,8 +168,8 @@ export default function App() {
       </header>
 
       <main>
-        <Cover opened={opened} burst={burst} onOpen={openInvitation} />
-        <Opening guestName={guestParam} />
+        <Cover opened={opened} burst={burst} onOpen={openInvitation} guestName={guestName} />
+        <Opening guestName={guestName} />
         <DateEvents />
         {cfg.showStory && <Story showDressCode={cfg.showDressCode} />}
         {!cfg.showStory && cfg.showDressCode && <Story showDressCode={true} />}
@@ -187,7 +184,6 @@ export default function App() {
         <Rsvp showRsvp={cfg.showRsvp} showGifts={cfg.showGifts} gifts={cfg.gifts} />
       </main>
 
-      {/* floating music button */}
       {opened && (
         <button
           type="button"

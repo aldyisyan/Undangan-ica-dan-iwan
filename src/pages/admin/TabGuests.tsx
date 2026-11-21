@@ -197,7 +197,7 @@ export default function TabGuests() {
       return {
         Nama: g.name,
         "No. WA": g.phone || "-",
-        "Link Undangan": buildInviteLink(g.name, ep || undefined),
+        "Link Undangan": buildInviteLink(g.name, ep || undefined, g.id),
         "Akad": (g.events?.showAkad ?? cfg.globalShowAkad) ? "Tampil" : "Disembunyikan",
         "Resepsi": (g.events?.showResepsi ?? cfg.globalShowResepsi) ? "Tampil" : "Disembunyikan",
         "Dikirim": g.sentAt ? new Date(g.sentAt).toLocaleString("id-ID") : "Belum",

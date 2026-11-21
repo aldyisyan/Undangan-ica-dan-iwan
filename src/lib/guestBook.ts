@@ -48,20 +48,37 @@ export function saveWaTemplate(tpl: string): void {
   try { localStorage.setItem(TPL_KEY, tpl); } catch { /* ignore */ }
 }
 
-export function buildInviteLink(name: string, eventParams?: string): string {
+/**
+ * Link tamu modern:
+ *   ?gid=<guestId>&to=<nama>&c=<ref>&ea=1&er=1
+ *
+ * - gid = sumber kebenaran untuk membaca nama & override acara terbaru dari database/cloud
+ * - to  = fallback cepat agar nama tetap tampil sebelum cloud selesai ditarik
+ */
+export function buildInviteLink(name: string, eventParams?: string, guestId?: string): string {
   const base = `${window.location.origin}${window.location.pathname}`;
   const params = new URLSearchParams();
   const trimmed = name.trim();
+  if (guestId?.trim()) params.set("gid", guestId.trim());
   if (trimmed) params.set("to", trimmed);
   const ref = encodeCloudParam();
   if (ref) params.set("c", ref);
   if (eventParams) {
-    // parse eventParams ("ea=0&er=1") dan tambahkan ke params
     const ep = new URLSearchParams(eventParams);
     ep.forEach((v, k) => params.set(k, v));
   }
   const q = params.toString();
   return q ? `${base}?${q}` : base;
+}
+
+export function getGuestIdParam(): string | null {
+  if (typeof window === "undefined") return null;
+  return new URLSearchParams(window.location.search).get("gid")?.trim() || null;
+}
+
+export function getGuestNameParam(): string | null {
+  if (typeof window === "undefined") return null;
+  return new URLSearchParams(window.location.search).get("to")?.trim() || null;
 }
 
 export function normalizeWaPhone(raw: string): string {
@@ -169,6 +186,22 @@ export function setGuestEvents(id: string, events: GuestEventVisibility): Invite
   const next = state.map((g) => (g.id === id ? { ...g, events } : g));
   commit(next);
   return next;
+}
+
+export function findGuestById(id: string | null | undefined, list: InviteGuest[] = state): InviteGuest | null {
+  if (!id) return null;
+  return list.find((g) => g.id === id) || null;
+}
+
+/**
+ * Dipakai di sisi tamu:
+ * - utamakan gid untuk membaca tamu terbaru dari DB/cloud
+ * - fallback ke ?to= agar layar pembuka tetap punya nama sebelum cloud selesai ditarik
+ */
+export function useGuestFromUrl(): InviteGuest | null {
+  const guests = useGuestBook();
+  const gid = getGuestIdParam();
+  return findGuestById(gid, guests);
 }
 
 export function useGuestBook(): InviteGuest[] {
