@@ -1,7 +1,7 @@
 import { DRESS_SWATCHES, SECTION_PAD, STORY, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
-import { HeartDoodle, Reveal, RoughFrame, SectionHead, Sprig } from "../lib/ui";
+import { HeartDoodle, Reveal, RoughFrame, SectionHead, Sprig, WashiTape3D } from "../lib/ui";
 
 function StoryVisual({ item, index }: { item: (typeof STORY)[number]; index: number }) {
   const cfg = useAdminConfig();
@@ -12,6 +12,7 @@ function StoryVisual({ item, index }: { item: (typeof STORY)[number]; index: num
   if (img) {
     return (
       <div className="polaroid relative mx-auto w-full max-w-[290px] rotate-[-2.5deg] p-3 pb-9 transition-transform duration-500 hover:rotate-0 md:mx-0">
+        <WashiTape3D className="absolute -top-3 left-1/2 -ml-12 rotate-[2deg] z-20 opacity-90" color={index % 2 === 0 ? "#7d8471" : "#b5533c"} />
         <span className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden />
         <div className="aspect-[4/5] overflow-hidden bg-paper2">
           <img src={img} alt={item.title} className="h-full w-full object-cover" loading="lazy" />

@@ -3,7 +3,7 @@ import groomFallback from "../assets/groom.jpg";
 import { SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
-import { DoodleDivider, HeartDoodle, Reveal, RoughFrame, SectionHead, Sprig } from "../lib/ui";
+import { DoodleDivider, EnamelPin, HeartDoodle, MetalClip, PressedFlower, Reveal, RoughFrame, SectionHead, Sprig } from "../lib/ui";
 
 function PortraitCard({
   img, alt, tag, nick, full, parents, rotate,
@@ -40,6 +40,15 @@ export default function Opening({ guestName }: { guestName?: string | null }) {
     <>
       {/* 01 · salam */}
       <section id="salam" className={`${SECTION_PAD} relative bg-paper2/70`}>
+        {/* 3D Ornaments scattered in the background layer */}
+        <div className="absolute left-6 top-10 rotate-12 opacity-60">
+          <PressedFlower className="h-16 w-16" />
+        </div>
+        <div className="absolute right-10 bottom-20 -rotate-12 opacity-40">
+          <PressedFlower className="h-20 w-20" />
+        </div>
+        <MetalClip className="absolute top-0 right-[25%] -translate-y-4 h-12 w-6 opacity-80" />
+
         <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 border-t border-dashed border-ink/20" />
         <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 border-b border-dashed border-ink/20" />
         <div className={WRAP}>
@@ -71,6 +80,9 @@ export default function Opening({ guestName }: { guestName?: string | null }) {
 
       {/* 02 · mempelai */}
       <section id="mempelai" className={`${SECTION_PAD} relative overflow-hidden`}>
+        <EnamelPin className="absolute top-20 right-10 h-6 w-6 opacity-80" color="#2c3e63" />
+        <EnamelPin className="absolute bottom-40 left-12 h-5 w-5 opacity-60" color="#b5533c" />
+        
         <Sprig className="pointer-events-none absolute left-4 top-16 hidden h-32 w-20 text-navy/20 lg:block" />
         <div className={WRAP}>
           <SectionHead num="02" kicker="The Bride & Groom" title="Mempelai" />

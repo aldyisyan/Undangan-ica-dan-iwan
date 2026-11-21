@@ -7,6 +7,7 @@ import { useWishes, addWish, type Wish } from "../lib/wishes";
 import { pushWishesToCloud } from "../lib/cloud";
 import {
   DoodleDivider,
+  EnamelPin,
   HeartDoodle,
   IconCheck,
   IconCopy,
@@ -106,6 +107,10 @@ export default function Rsvp({
             <div className="mt-16 grid gap-12 lg:grid-cols-2 lg:gap-10">
               <Reveal>
                 <form onSubmit={submit} className="relative bg-paper px-6 py-8 sm:px-8">
+                  {/* Pin holding the form */}
+                  <EnamelPin className="absolute -top-3 left-[15%] z-20 h-6 w-6" color="#2c3e63" />
+                  <EnamelPin className="absolute -top-3 right-[15%] z-20 h-6 w-6" color="#b5533c" />
+                  
                   <RoughFrame stroke="rgba(30,27,24,0.5)" />
                   <p className="font-hand text-3xl leading-none text-ink">Apakah Anda akan hadir?</p>
                   <p className="mt-2 text-[13px] leading-relaxed text-ink/60">Mohon konfirmasi sebelum 14 November 2026 agar kami dapat menyiapkan tempat terbaik untuk Anda.</p>

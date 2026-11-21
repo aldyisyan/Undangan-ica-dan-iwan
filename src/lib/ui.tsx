@@ -465,6 +465,73 @@ export function TwigLeft({ className = "" }: { className?: string }) {
   );
 }
 
+/** Pin 3D Enamel — memberikan kesan benda yang menancap/menahan kertas */
+export function EnamelPin({ color = "#b5533c", className = "h-5 w-5" }) {
+  return (
+    <div className={`depth-3d flex items-center justify-center ${className}`}>
+      <svg viewBox="0 0 40 40" className="h-full w-full drop-shadow-lg">
+        <defs>
+          <radialGradient id="pinGrad" cx="35%" cy="35%" r="50%">
+            <stop offset="0%" stopColor="white" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="black" stopOpacity="0.1" />
+          </radialGradient>
+        </defs>
+        <circle cx="20" cy="20" r="18" fill={color} stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
+        <circle cx="20" cy="20" r="18" fill="url(#pinGrad)" />
+        <circle cx="16" cy="14" r="5" fill="white" opacity="0.3" />
+      </svg>
+    </div>
+  );
+}
+
+/** Klip Kertas 3D Logam */
+export function MetalClip({ className = "h-10 w-5" }) {
+  return (
+    <svg viewBox="0 0 24 48" className={`depth-3d ${className}`} fill="none">
+      <path
+        d="M17 8v26a6 6 0 0 1-12 0V10a3.4 3.4 0 0 1 6.8 0v22"
+        stroke="#2c3e63"
+        strokeWidth="2.8"
+        strokeLinecap="round"
+        className="drop-shadow-md"
+      />
+      <path
+        d="M17 8v26a6 6 0 0 1-12 0V10a3.4 3.4 0 0 1 6.8 0v22"
+        stroke="white"
+        strokeWidth="0.8"
+        strokeLinecap="round"
+        opacity="0.4"
+      />
+    </svg>
+  );
+}
+
+/** Selotip Washi Realistik 3D */
+export function WashiTape3D({ color = "#7d8471", className = "" }) {
+  return (
+    <div
+      className={`washi-3d depth-3d pointer-events-none h-6 w-24 ${className}`}
+      style={{
+        backgroundColor: color,
+        backgroundImage: `repeating-linear-gradient(90deg, rgba(255,255,255,0.1) 0 2px, transparent 2px 12px)`,
+      }}
+    />
+  );
+}
+
+/** Bunga Kering 3D (Pressed Flower) */
+export function PressedFlower({ className = "h-12 w-12" }) {
+  return (
+    <div className={`depth-3d ${className}`}>
+      <svg viewBox="0 0 100 100" fill="#e7d3be" opacity="0.85">
+        <path d="M50 50 Q 70 10 90 50 T 50 90 T 10 50 T 50 10" />
+        <path d="M50 50 Q 90 30 90 50 T 50 70 T 10 50 T 50 30" transform="rotate(45 50 50)" />
+        <circle cx="50" cy="50" r="8" fill="#b5533c" />
+      </svg>
+    </div>
+  );
+}
+
 export type RailItem = { id: string; num: string; label: string };
 
 export function MarginRail({ items, active }: { items: RailItem[]; active: string }) {

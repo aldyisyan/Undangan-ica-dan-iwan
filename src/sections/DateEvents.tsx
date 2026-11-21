@@ -5,13 +5,16 @@ import { useMediaSrc } from "../lib/mediaStore";
 import { useEventVisibility } from "../lib/eventVisibility";
 import SaveToCalendar from "../components/SaveToCalendar";
 import {
+  EnamelPin,
   HeartDoodle,
   IconArrow,
   IconMap,
+  MetalClip,
   Reveal,
   RoughFrame,
   SectionHead,
   Sprig,
+  WashiTape3D,
 } from "../lib/ui";
 
 const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
@@ -148,6 +151,7 @@ export default function DateEvents() {
             <Reveal delay={160}>
               {calendarPhoto ? (
                 <figure className="polaroid relative mx-auto w-full max-w-[320px] p-3 pb-8 md:mx-0">
+                  <WashiTape3D className="absolute -top-4 left-1/2 -ml-12 rotate-[-4deg] z-20" color="#b5533c" />
                   <span className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden />
                   <div className="aspect-[4/5] overflow-hidden bg-paper2">
                     <img
@@ -187,7 +191,9 @@ export default function DateEvents() {
             </div>
           )}
 
-          <Reveal delay={120} className="mt-12 text-center">
+          <Reveal delay={120} className="mt-12 text-center relative">
+            <EnamelPin className="absolute -top-6 left-[15%] h-5 w-5" color="#7d8471" />
+            <EnamelPin className="absolute -bottom-4 right-[10%] h-6 w-6" color="#2c3e63" />
             <p className="font-hand text-3xl text-ink">{cfg.venue}</p>
             <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-ink/60">{cfg.address}</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -200,7 +206,9 @@ export default function DateEvents() {
           </Reveal>
 
           {mapsPhoto ? (
-            <Reveal delay={180} className="mt-10">
+            <Reveal delay={180} className="mt-10 relative">
+              {/* Paperclip on the map photo */}
+              <MetalClip className="absolute top-0 right-10 -translate-y-4 z-20 h-10 w-5 opacity-90" />
               <figure className="relative overflow-hidden border border-ink/15 bg-paper">
                 <div className="aspect-[16/9] overflow-hidden bg-paper2">
                   <img

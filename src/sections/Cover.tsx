@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import coverFallback from "../assets/cover.jpg";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
-import { HeartDoodle, OvalButton, Reveal } from "../lib/ui";
+import { EnamelPin, HeartDoodle, OvalButton, Reveal, WashiTape3D } from "../lib/ui";
 
 const BURST = Array.from({ length: 14 }, (_, i) => ({
   left: 8 + ((i * 37) % 84),
@@ -77,7 +77,11 @@ export default function Cover({
           </div>
 
           <div className="relative mx-auto mt-6 w-full max-w-[280px] sm:max-w-[320px]">
-            <div className="polaroid p-2 pb-6">
+            <div className="polaroid relative p-2 pb-6">
+              {/* 3D Pin & Tape holding the main photo */}
+              <EnamelPin className="absolute -top-3 left-1/2 -ml-2.5 z-20 h-6 w-6" />
+              <WashiTape3D className="absolute -left-6 top-10 rotate-[-15deg] opacity-70" color="#7d8471" />
+              
               <div className="aspect-[4/3] overflow-hidden bg-paper2">
                 <img
                   src={heroSrc}
