@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
+import { useMediaSrc } from "../lib/mediaStore";
 import { useEventVisibility } from "../lib/eventVisibility";
 import SaveToCalendar from "../components/SaveToCalendar";
 import {
@@ -104,6 +105,9 @@ function EventCard({ data, rotate }: { data: { title: string; time: string; plac
 export default function DateEvents() {
   const cfg = useAdminConfig();
   const ev = useEventVisibility();
+  /* visual yang bisa di-switch ke foto dari admin */
+  const calendarPhoto = useMediaSrc(cfg.calendarPhoto);
+  const mapsPhoto = useMediaSrc(cfg.mapsPhoto);
   const weddingDate = useMemo(() => new Date(cfg.weddingDate), [cfg.weddingDate]);
   const c = useCountdown(cfg.weddingDate);
 
@@ -137,7 +141,27 @@ export default function DateEvents() {
                 </div>
               )}
             </Reveal>
-            <Reveal delay={160}><MiniCalendar targetDate={weddingDate} /></Reveal>
+            {/* Sakelar visual: foto (di-upload di tab Media) bila ada, else kalender grid */}
+            <Reveal delay={160}>
+              {calendarPhoto ? (
+                <figure className="polaroid relative mx-auto w-full max-w-[320px] p-3 pb-8 md:mx-0">
+                  <span className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden />
+                  <div className="aspect-[4/5] overflow-hidden bg-paper2">
+                    <img
+                      src={calendarPhoto}
+                      alt={`Kalender ${cfg.weddingDateLabel}`}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <figcaption className="mt-3 text-center font-note text-sm text-terra">
+                    {cfg.weddingDateLabel}
+                  </figcaption>
+                </figure>
+              ) : (
+                <MiniCalendar targetDate={weddingDate} />
+              )}
+            </Reveal>
           </div>
         </div>
       </section>
@@ -173,13 +197,41 @@ export default function DateEvents() {
             </div>
           </Reveal>
 
-          {cfg.showMapsEmbed && cfg.mapsEmbed && (
+          {/* Sakelar visual peta: foto (bila ada) → embed → hanya tombol */}
+          {mapsPhoto ? (
+            <Reveal delay={180} className="mt-10">
+              <figure className="relative overflow-hidden border border-ink/15 bg-paper">
+                <div className="aspect-[16/9] overflow-hidden bg-paper2">
+                  <img
+                    src={mapsPhoto}
+                    alt={`Peta lokasi ${cfg.venue}`}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-ink/20 px-5 py-4">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-navy/70">Lokasi Acara</p>
+                    <p className="mt-1 truncate text-sm font-semibold text-ink">{cfg.venue}</p>
+                  </div>
+                  <a
+                    href={cfg.mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex shrink-0 items-center gap-2 border border-ink/30 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-terra hover:text-terra"
+                  >
+                    <IconMap className="h-3.5 w-3.5" /> Buka Maps
+                  </a>
+                </figcaption>
+              </figure>
+            </Reveal>
+          ) : cfg.showMapsEmbed && cfg.mapsEmbed ? (
             <Reveal delay={180} className="mt-10">
               <div className="relative overflow-hidden" style={{ paddingBottom: "56.25%", height: 0 }}>
                 <iframe src={cfg.mapsEmbed} title="Lokasi Venue" className="absolute inset-0 h-full w-full border-0" allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
               </div>
             </Reveal>
-          )}
+          ) : null}
 
           <div className="mt-12"><SaveToCalendar /></div>
         </div>

@@ -76,18 +76,8 @@ export default function Opening({ guestName }: { guestName?: string | null }) {
           <SectionHead num="02" kicker="The Bride & Groom" title="Mempelai" />
 
           <div className="mt-14 grid gap-14 sm:grid-cols-2 sm:gap-8">
+            {/* Susunan mempelai: wanita dahulu, baru pria */}
             <Reveal delay={80}>
-              <PortraitCard
-                img={groomImg}
-                alt={`Foto ${cfg.groomNick}`}
-                tag="Mempelai Pria"
-                nick={cfg.groomNick}
-                full={cfg.groomName}
-                parents={cfg.groomParents}
-                rotate="sm:-rotate-1"
-              />
-            </Reveal>
-            <Reveal delay={200}>
               <PortraitCard
                 img={brideImg}
                 alt={`Foto ${cfg.brideNick}`}
@@ -95,6 +85,17 @@ export default function Opening({ guestName }: { guestName?: string | null }) {
                 nick={cfg.brideNick}
                 full={cfg.brideName}
                 parents={cfg.brideParents}
+                rotate="sm:-rotate-1"
+              />
+            </Reveal>
+            <Reveal delay={200}>
+              <PortraitCard
+                img={groomImg}
+                alt={`Foto ${cfg.groomNick}`}
+                tag="Mempelai Pria"
+                nick={cfg.groomNick}
+                full={cfg.groomName}
+                parents={cfg.groomParents}
                 rotate="sm:rotate-1"
               />
             </Reveal>

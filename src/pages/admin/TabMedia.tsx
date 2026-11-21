@@ -191,6 +191,55 @@ export default function TabMedia() {
         )}
       </section>
 
+      {/* ───────── Foto Penutup & Visual ───────── */}
+      <section className="space-y-5 border-t border-dashed border-ink/15 pt-8">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.28em] text-terra">
+          Foto Penutup &amp; Visual Pendukung
+        </h3>
+        <p className="text-xs text-ink/55">
+          Tiga slot ini mengganti visual di bagian bawah undangan. Kosongkan satu slot untuk
+          kembali ke tampilan bawaan — itulah sakelar pengembaliannya.
+        </p>
+        <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+          <MediaUpload
+            label="Foto Penutup (paling bawah)"
+            mediaKey="closing-photo"
+            currentValue={cfg.closingPhoto}
+            accept="image/*"
+            aspect={3 / 2}
+            cropShape="rect"
+            previewClass="h-36 w-full"
+            cropHint="Rasio 3:2 — pas dengan bingkai foto penutup."
+            hint="Menggantikan ilustrasi pasangan berjalan di bagian Terima Kasih."
+            onSave={(ref) => saveAdminConfig({ closingPhoto: ref })}
+          />
+          <MediaUpload
+            label="Foto Visual Kalender"
+            mediaKey="calendar-photo"
+            currentValue={cfg.calendarPhoto}
+            accept="image/*"
+            aspect={4 / 5}
+            cropShape="rect"
+            previewClass="h-44 w-full"
+            cropHint="Rasio 4:5 — menggantikan kalender grid di section Hari-H."
+            hint="Diisi → kalender grid berganti jadi foto. Kosongkan → kalender kembali."
+            onSave={(ref) => saveAdminConfig({ calendarPhoto: ref })}
+          />
+          <MediaUpload
+            label="Foto Visual Peta"
+            mediaKey="maps-photo"
+            currentValue={cfg.mapsPhoto}
+            accept="image/*"
+            aspect={16 / 9}
+            cropShape="rect"
+            previewClass="h-28 w-full"
+            cropHint="Rasio 16:9 — menggantikan embed Google Maps."
+            hint="Diisi → tampil foto lokasi. Kosongkan → pakai embed atau tombol peta."
+            onSave={(ref) => saveAdminConfig({ mapsPhoto: ref })}
+          />
+        </div>
+      </section>
+
       {/* ───────── Love Story ───────── */}
       <section className="space-y-4 border-t border-dashed border-ink/15 pt-8">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.28em] text-terra">Foto Love Story</h3>

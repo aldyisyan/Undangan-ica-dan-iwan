@@ -75,6 +75,18 @@ export interface AdminConfig {
   /** Foto Love Story — per indeks cerita; string kosong = pakai foto bawaan */
   storyPhotos: string[];
 
+  /** Foto penutup — gambar paling bawah undangan. Kosong = ilustrasi bawaan. */
+  closingPhoto: string;
+
+  /**
+   * Visual kalender countdown. Kosong = kalender grid bawaan.
+   * Diisi foto → visual berpindah ke foto (bisa dikosongkan kembali untuk switch balik).
+   */
+  calendarPhoto: string;
+
+  /** Visual peta lokasi. Kosong = embed / tombol bawaan. Diisi foto → tampil foto. */
+  mapsPhoto: string;
+
   /** Pesan template WhatsApp undangan */
   waTemplate: string;
 
@@ -137,6 +149,9 @@ const DEFAULT: AdminConfig = {
   heroCoverPhoto: "",
   galleryPhotos: [],
   storyPhotos: [],
+  closingPhoto: "",
+  calendarPhoto: "",
+  mapsPhoto: "",
 
   waTemplate: `Kepada Yth. {nama}\ndi tempat\n\nAssalamu'alaikum Warahmatullahi Wabarakatuh\n\nTanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara pernikahan kami:\n\n{mempelai}\n{tanggal}\n{lokasi}\n\nUndangan digital khusus untuk Anda dapat dibuka melalui tautan berikut:\n{link}\n\nMerupakan kehormatan bagi kami apabila Anda berkenan hadir.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh`,
 

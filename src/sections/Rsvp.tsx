@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import closing from "../assets/closing.jpg";
 import { SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
+import { useMediaSrc } from "../lib/mediaStore";
 import { useWishes, addWish, type Wish } from "../lib/wishes";
 import { getCloudAdmin } from "../lib/cloudConfig";
 import { pushWishesToCloud } from "../lib/cloud";
@@ -41,6 +42,7 @@ export default function Rsvp({
 }) {
   const cfg = useAdminConfig();
   const cloudWishes = useWishes();
+  const closingPhoto = useMediaSrc(cfg.closingPhoto);
   const [name, setName] = useState("");
   const [attend, setAttend] = useState<"Hadir" | "Tidak Hadir" | "Masih Ragu">("Hadir");
   const [guestCount, setGuestCount] = useState(2);
@@ -229,7 +231,12 @@ export default function Rsvp({
         <div className="mx-auto mt-12 w-full max-w-lg px-6 sm:max-w-2xl">
           <Reveal className="relative">
             <div className="relative aspect-[3/2] overflow-hidden bg-paper2">
-              <img src={closing} alt="Ilustrasi Iwan dan Ica berjalan beriringan pulang" className="h-full w-full object-cover" loading="lazy" />
+              <img
+                src={closingPhoto || closing}
+                alt={`Foto penutup ${cfg.groomNick} & ${cfg.brideNick}`}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
             </div>
             <svg className="pointer-events-none absolute inset-0 h-full w-full text-ink/70" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none" aria-hidden>
               <path d="M6 8C80 4 200 10 294 6c3 54-2 134 1 187-85 4-175-2-288 2C3 140 9 60 6 8Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
