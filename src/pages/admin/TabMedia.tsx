@@ -139,18 +139,6 @@ export default function TabMedia() {
         </p>
         <div className="grid gap-10 sm:grid-cols-2">
           <MediaUpload
-            label={`Foto ${cfg.groomNick} (Mempelai Pria) — Lingkaran 1:1`}
-            mediaKey="groom-photo"
-            currentValue={cfg.groomPhoto}
-            accept="image/*"
-            aspect={1}
-            cropShape="circle"
-            previewClass="h-36 w-36 rounded-full"
-            cropHint="Atur agar wajah berada di tengah lingkaran crop."
-            hint="Frame lingkaran — gunakan foto wajah dengan latar bersih."
-            onSave={(ref) => saveAdminConfig({ groomPhoto: ref })}
-          />
-          <MediaUpload
             label={`Foto ${cfg.brideNick} (Mempelai Wanita) — Lingkaran 1:1`}
             mediaKey="bride-photo"
             currentValue={cfg.bridePhoto}
@@ -161,6 +149,18 @@ export default function TabMedia() {
             cropHint="Atur agar wajah berada di tengah lingkaran crop."
             hint="Frame lingkaran — gunakan foto wajah dengan latar bersih."
             onSave={(ref) => saveAdminConfig({ bridePhoto: ref })}
+          />
+          <MediaUpload
+            label={`Foto ${cfg.groomNick} (Mempelai Pria) — Lingkaran 1:1`}
+            mediaKey="groom-photo"
+            currentValue={cfg.groomPhoto}
+            accept="image/*"
+            aspect={1}
+            cropShape="circle"
+            previewClass="h-36 w-36 rounded-full"
+            cropHint="Atur agar wajah berada di tengah lingkaran crop."
+            hint="Frame lingkaran — gunakan foto wajah dengan latar bersih."
+            onSave={(ref) => saveAdminConfig({ groomPhoto: ref })}
           />
         </div>
       </section>

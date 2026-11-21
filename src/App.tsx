@@ -157,7 +157,7 @@ export default function App() {
       >
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-5 py-3">
           <a href="#cover" className="font-hand text-2xl leading-none text-ink">
-            {cfg.groomNick} <span className="text-terra">&amp;</span> {cfg.brideNick}
+            {cfg.brideNick} <span className="text-terra">&amp;</span> {cfg.groomNick}
           </a>
           <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-navy/75">{cfg.weddingDateLabel}</p>
         </div>

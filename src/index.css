@@ -286,3 +286,283 @@
     animation: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════
+   GALERI — bingkai album tempel (scrapbook)
+   ══════════════════════════════════════════════════ */
+.scrap {
+  --tilt: 0deg;
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  transform: rotate(var(--tilt));
+  transition:
+    transform 0.55s cubic-bezier(0.22, 0.7, 0.2, 1),
+    box-shadow 0.45s ease,
+    filter 0.45s ease;
+  will-change: transform;
+}
+.scrap:hover,
+.scrap:focus-visible {
+  transform: rotate(0deg) translateY(-8px);
+}
+
+/* jendela foto + tone kertas cetak */
+.scrap__win {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--color-paper2);
+  box-shadow: inset 0 0 0 1px rgba(30, 27, 24, 0.13);
+}
+.scrap__win img {
+  display: block;
+  filter: saturate(0.93) contrast(1.03) brightness(1.01);
+  transition:
+    transform 0.9s cubic-bezier(0.22, 0.7, 0.2, 1),
+    filter 0.6s ease;
+}
+.scrap:hover .scrap__win img {
+  transform: scale(1.04);
+  filter: none;
+}
+
+/* keterangan tulisan tangan */
+.scrap__cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.25rem 0.1rem;
+}
+.scrap__cap-text {
+  font-family: var(--font-note);
+  font-size: 13px;
+  line-height: 1.3;
+  color: rgba(30, 27, 24, 0.72);
+  transition: color 0.35s ease;
+}
+.scrap:hover .scrap__cap-text {
+  color: var(--color-terra);
+}
+.scrap__no {
+  flex-shrink: 0;
+  font-family: var(--font-note);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(44, 62, 99, 0.6);
+}
+
+/* tombol zoom kecil */
+.scrap__zoom {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  display: grid;
+  height: 1.85rem;
+  width: 1.85rem;
+  place-items: center;
+  border: 1px solid rgba(253, 251, 247, 0.65);
+  border-radius: 9999px;
+  background: rgba(30, 27, 24, 0.42);
+  color: var(--color-paper);
+  opacity: 0;
+  transform: scale(0.7);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+.scrap:hover .scrap__zoom,
+.scrap:focus-visible .scrap__zoom {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── 1 · polaroid ── */
+.f-polaroid {
+  background: #fffdf8;
+  padding: 0.62rem 0.62rem 0.75rem;
+  box-shadow:
+    0 1px 0 rgba(30, 27, 24, 0.13),
+    0 20px 34px -26px rgba(30, 27, 24, 0.78);
+}
+.f-polaroid:hover {
+  box-shadow:
+    0 1px 0 rgba(30, 27, 24, 0.13),
+    0 34px 50px -26px rgba(30, 27, 24, 0.82);
+}
+.f-polaroid .scrap__cap {
+  justify-content: center;
+  padding-top: 0.75rem;
+}
+.f-polaroid .scrap__cap-text {
+  font-size: 14px;
+}
+
+/* ── 2 · washi tape ── */
+.f-taped {
+  background: var(--color-paper2);
+  padding: 0.85rem;
+  box-shadow: 0 16px 28px -24px rgba(30, 27, 24, 0.72);
+}
+.f-taped:hover {
+  box-shadow: 0 30px 44px -24px rgba(30, 27, 24, 0.75);
+}
+.washi {
+  position: absolute;
+  height: 1.55rem;
+  width: 5.2rem;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.45) 0 2px, transparent 2px 7px),
+    var(--washi, rgba(125, 132, 113, 0.6));
+  border-left: 1px dashed rgba(255, 255, 255, 0.55);
+  border-right: 1px dashed rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 3px rgba(30, 27, 24, 0.2);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── 3 · dudukan sudut foto (photo corners) ── */
+.f-mount {
+  background: #fffdf8;
+  padding: 1rem;
+  box-shadow:
+    0 1px 0 rgba(30, 27, 24, 0.1),
+    0 18px 30px -26px rgba(30, 27, 24, 0.72);
+}
+.f-mount .scrap__cap {
+  justify-content: center;
+  padding-top: 0.7rem;
+}
+.f-mount .scrap__cap-text {
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+  color: rgba(30, 27, 24, 0.85);
+}
+.pcorner {
+  position: absolute;
+  height: 1.35rem;
+  width: 1.35rem;
+  background: var(--color-terra);
+  opacity: 0.92;
+  z-index: 2;
+  transition: transform 0.45s cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+.pcorner--tl { top: 0.45rem; left: 0.45rem; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.pcorner--tr { top: 0.45rem; right: 0.45rem; clip-path: polygon(100% 0, 100% 100%, 0 0); }
+.pcorner--bl { bottom: 0.45rem; left: 0.45rem; clip-path: polygon(0 100%, 100% 100%, 0 0); }
+.pcorner--br { bottom: 0.45rem; right: 0.45rem; clip-path: polygon(100% 100%, 100% 0, 0 100%); }
+.scrap:hover .pcorner { opacity: 1; }
+.scrap:hover .pcorner--tl { transform: translate(-2px, -2px); }
+.scrap:hover .pcorner--tr { transform: translate(2px, -2px); }
+.scrap:hover .pcorner--bl { transform: translate(-2px, 2px); }
+.scrap:hover .pcorner--br { transform: translate(2px, 2px); }
+.f-mount .scrap__cap {
+  padding-bottom: 0.2rem;
+}
+
+/* ── 4 · bingkai tinta gambar tangan ── */
+.f-ink {
+  padding: 0.55rem;
+}
+.scrap__ink {
+  position: absolute;
+  inset: -0.45rem;
+  width: calc(100% + 0.9rem);
+  height: calc(100% + 0.9rem);
+  color: rgba(30, 27, 24, 0.55);
+  pointer-events: none;
+  z-index: 2;
+}
+.f-ink .scrap__cap {
+  padding-top: 0.7rem;
+}
+.f-ink .scrap__cap-text {
+  font-family: var(--font-sans);
+  font-style: italic;
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+  color: rgba(30, 27, 24, 0.66);
+}
+
+/* ── 5 · klip kertas + cap pos ── */
+.f-clip {
+  background: #fffdf8;
+  padding: 1.6rem 0.75rem 0.7rem;
+  box-shadow:
+    0 1px 0 rgba(30, 27, 24, 0.12),
+    0 18px 30px -26px rgba(30, 27, 24, 0.7);
+}
+.paperclip {
+  position: absolute;
+  top: -0.55rem;
+  left: 50%;
+  height: 2.3rem;
+  width: 1.15rem;
+  margin-left: -0.575rem;
+  color: var(--color-navy);
+  opacity: 0.75;
+  z-index: 3;
+  pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+.scrap:hover .paperclip {
+  transform: translateY(-4px) rotate(-6deg);
+}
+.postmark {
+  position: absolute;
+  right: -0.4rem;
+  bottom: 2.6rem;
+  display: grid;
+  height: 4rem;
+  width: 4rem;
+  place-items: center;
+  border: 1.5px dashed rgba(181, 83, 60, 0.75);
+  border-radius: 9999px;
+  color: var(--color-terra);
+  font-family: var(--font-note);
+  font-size: 11px;
+  line-height: 1;
+  text-align: center;
+  background: rgba(253, 251, 247, 0.72);
+  transform: rotate(-11deg);
+  opacity: 0.85;
+  z-index: 3;
+  pointer-events: none;
+  transition: transform 0.5s cubic-bezier(0.22, 0.7, 0.2, 1), opacity 0.4s ease;
+}
+.postmark::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(181, 83, 60, 0.4);
+  border-radius: 9999px;
+}
+.scrap:hover .postmark {
+  transform: rotate(-4deg) scale(1.06);
+  opacity: 1;
+}
+
+/* kartu kutipan senada */
+.quote-card {
+  position: relative;
+  background: var(--color-paper2);
+  padding: 2rem 1.35rem 1.6rem;
+  text-align: center;
+  box-shadow: 0 14px 26px -24px rgba(30, 27, 24, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrap,
+  .scrap:hover,
+  .scrap:focus-visible {
+    transform: none;
+  }
+  .scrap__win img,
+  .scrap:hover .scrap__win img {
+    transform: none;
+    filter: none;
+  }
+}

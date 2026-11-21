@@ -165,7 +165,7 @@ export default function TabGuests() {
     const link = buildInviteLink(g.name, ep || undefined);
     const msg = renderWaMessage(tpl, {
       nama: g.name,
-      mempelai: `${cfg.groomNick} & ${cfg.brideNick}`,
+      mempelai: `${cfg.brideNick} & ${cfg.groomNick}`,
       tanggal: cfg.weddingDateLabel,
       lokasi: `${cfg.venue}, ${cfg.address}`,
       link,
@@ -201,7 +201,7 @@ export default function TabGuests() {
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Tamu");
-    XLSX.writeFile(wb, `tamu-${cfg.groomNick}-${cfg.brideNick}.xlsx`);
+    XLSX.writeFile(wb, `tamu-${cfg.brideNick}-${cfg.groomNick}.xlsx`);
   };
 
   const importXlsx = (file: File) => {

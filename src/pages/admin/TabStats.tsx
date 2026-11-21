@@ -165,14 +165,14 @@ export default function TabStats({ onNavigate }: { onNavigate?: (tab: string) =>
           desc="Tiga ucapan RSVP yang paling baru masuk."
           action={<Btn onClick={() => onNavigate?.("wishes")}>Lihat semua</Btn>}
         >
-          {wishes.length === 0 ? (
+          {wishes.filter((w) => w.message.trim().length > 0).length === 0 ? (
             <EmptyState
               title="Belum ada ucapan"
-              desc="Ucapan dari tamu akan muncul di sini setelah mereka mengisi form RSVP."
+              desc="Hanya ucapan yang berisi doa yang tampil di sini. RSVP tanpa pesan tetap terhitung di angka di atas."
             />
           ) : (
             <ul className="space-y-3">
-              {wishes.slice(0, 3).map((w, i) => (
+              {wishes.filter((w) => w.message.trim().length > 0).slice(0, 3).map((w, i) => (
                 <li key={`${w.name}-${i}`} className="border-l-2 border-terra/50 pl-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-[15px] font-semibold text-ink">{w.name}</p>

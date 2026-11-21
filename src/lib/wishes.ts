@@ -11,7 +11,7 @@ export interface Wish {
 const KEY = "rk-wedding-wishes-v2";
 
 const seed: Wish[] = [
-  { name: "Keluarga Santoso", attend: "hadir", count: 4, message: "Selamat! Semoga menjadi keluarga sakinah, mawaddah, warahmah. Bahagia selalu Iwan & Ica!", at: 1 },
+  { name: "Keluarga Santoso", attend: "hadir", count: 4, message: "Selamat! Semoga menjadi keluarga sakinah, mawaddah, warahmah. Bahagia selalu Ica & Iwan!", at: 1 },
   { name: "Nadia & Fajar", attend: "hadir", count: 2, message: "AAA akhirnya! Nggak sabar lihat kalian di pelaminan. Bahagia selalu ya!", at: 2 },
   { name: "Pak Hendra", attend: "ragu", message: "Barakallahu lakuma! Semoga lancar sampai hari H. Kami usahakan hadir!", at: 3 },
 ];

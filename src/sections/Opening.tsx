@@ -64,7 +64,7 @@ export default function Opening({ guestName }: { guestName?: string | null }) {
                 QS. Ar-Rum &middot; Ayat 21
               </footer>
             </blockquote>
-            <p className="mt-8 font-hand text-3xl text-navy">{cfg.groomNick} &amp; {cfg.brideNick}</p>
+            <p className="mt-8 font-hand text-3xl text-navy">{cfg.brideNick} &amp; {cfg.groomNick}</p>
           </Reveal>
         </div>
       </section>

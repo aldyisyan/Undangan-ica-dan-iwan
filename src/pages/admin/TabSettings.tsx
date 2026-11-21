@@ -55,17 +55,17 @@ export default function TabSettings() {
       />
 
       <section className="space-y-5 border-t border-dashed border-ink/15 pt-7">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.28em] text-terra">Mempelai Pria</h3>
-        {field("groomNick", "Panggilan")}
-        {field("groomName", "Nama Lengkap")}
-        {field("groomParents", "Putra dari", "textarea")}
-      </section>
-
-      <section className="space-y-5 border-t border-dashed border-ink/15 pt-7">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.28em] text-terra">Mempelai Wanita</h3>
         {field("brideNick", "Panggilan")}
         {field("brideName", "Nama Lengkap")}
         {field("brideParents", "Putri dari", "textarea")}
+      </section>
+
+      <section className="space-y-5 border-t border-dashed border-ink/15 pt-7">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.28em] text-terra">Mempelai Pria</h3>
+        {field("groomNick", "Panggilan")}
+        {field("groomName", "Nama Lengkap")}
+        {field("groomParents", "Putra dari", "textarea")}
       </section>
 
       <section className="space-y-5 border-t border-dashed border-ink/15 pt-7">

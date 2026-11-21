@@ -74,7 +74,7 @@ export default function Cover({
               <div className="aspect-[4/3] overflow-hidden bg-paper2">
                 <img
                   src={heroSrc}
-                  alt={`Ilustrasi ${cfg.groomNick} dan ${cfg.brideNick}`}
+                  alt={`Ilustrasi ${cfg.brideNick} dan ${cfg.groomNick}`}
                   className="h-full w-full object-cover"
                 />
               </div>

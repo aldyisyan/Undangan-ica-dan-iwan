@@ -132,7 +132,7 @@ export default function AdminPage() {
           <div className="min-w-0">
             <p className="truncate font-hand text-2xl leading-none text-ink">Admin Panel</p>
             <p className="mt-0.5 truncate text-[9px] font-semibold uppercase tracking-[0.2em] text-navy/60">
-              {cfg.groomNick} &amp; {cfg.brideNick} · {cfg.weddingDateLabel}
+              {cfg.brideNick} &amp; {cfg.groomNick} · {cfg.weddingDateLabel}
             </p>
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function AdminPage() {
             <div className="flex min-w-0 items-center gap-2.5 lg:hidden">
               <HeartDoodle className="h-4 w-4 shrink-0 text-terra" filled />
               <p className="truncate font-hand text-xl leading-none text-ink">
-                {cfg.groomNick} <span className="text-terra">&amp;</span> {cfg.brideNick}
+                {cfg.brideNick} <span className="text-terra">&amp;</span> {cfg.groomNick}
               </p>
             </div>
 
@@ -252,7 +252,7 @@ export default function AdminPage() {
 
         <footer className="border-t border-dashed border-ink/15 px-4 py-8 text-center sm:px-6">
           <p className="font-note text-[13px] text-ink/45">
-            Panel admin {cfg.groomNick} &amp; {cfg.brideNick} — semua perubahan tersimpan otomatis.
+            Panel admin {cfg.brideNick} &amp; {cfg.groomNick} — semua perubahan tersimpan otomatis.
           </p>
         </footer>
       </div>

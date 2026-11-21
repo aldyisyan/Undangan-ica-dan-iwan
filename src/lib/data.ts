@@ -141,7 +141,7 @@ export const SEED_WISHES = [
     name: "Sinta Maharani",
     status: "Masih Ragu",
     guests: 1,
-    message: "Selamat ya Iwan & Ica! Aku usahakan hadir, doakan ya.",
+    message: "Selamat ya Ica & Iwan! Aku usahakan hadir, doakan ya.",
     when: "5 hari lalu",
   },
 ];

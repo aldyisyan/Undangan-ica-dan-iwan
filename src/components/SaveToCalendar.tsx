@@ -31,7 +31,7 @@ export default function SaveToCalendar({ compact = false }: { compact?: boolean 
 
   if (!cfg.showSaveCalendar) return null;
 
-  const title = `Pernikahan ${cfg.groomNick} & ${cfg.brideNick}`;
+  const title = `Pernikahan ${cfg.brideNick} & ${cfg.groomNick}`;
   const loc = `${cfg.venue}, ${cfg.address}`;
   const desc = `Resepsi: ${cfg.resepsiTime} — ${cfg.resepsiPlace}`;
   const startISO = cfg.weddingDate; // "2026-11-21T09:00:00+07:00"
@@ -50,7 +50,7 @@ export default function SaveToCalendar({ compact = false }: { compact?: boolean 
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `undangan-${cfg.groomNick}-${cfg.brideNick}.ics`.toLowerCase().replace(/\s+/g, "-");
+    a.download = `undangan-${cfg.brideNick}-${cfg.groomNick}.ics`.toLowerCase().replace(/\s+/g, "-");
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -78,7 +78,7 @@ function apply(): void {
   if (typeof document === "undefined") return;
   const cfg = getAdminConfig();
 
-  const couple = `${cfg.groomNick} & ${cfg.brideNick}`;
+  const couple = `${cfg.brideNick} & ${cfg.groomNick}`;
   const date = shortDate(cfg.weddingDate);
   const venue = cfg.venue.trim();
 
@@ -91,8 +91,8 @@ function apply(): void {
     `Undangan pernikahan ${couple} — ${longDate}${venue ? ` di ${venue}` : ""}.`
   );
 
-  // Favicon mengikuti inisial mempelai
-  setFavicon(faviconDataUri(monogram(cfg.groomNick, cfg.brideNick), document.title));
+  // Favicon mengikuti inisial mempelai (wanita lebih dulu)
+  setFavicon(faviconDataUri(monogram(cfg.brideNick, cfg.groomNick), document.title));
 }
 
 /* Terapkan saat muat, lalu pantau perubahan konfigurasi admin. */

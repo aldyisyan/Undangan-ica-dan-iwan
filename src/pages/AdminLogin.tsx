@@ -25,7 +25,7 @@ export default function AdminLogin({ onLogin }: { onLogin: () => void }) {
           <HeartDoodle className="heartbeat mx-auto h-10 w-10 text-terra" filled />
           <h1 className="mt-4 font-hand text-5xl text-ink">Admin Panel</h1>
           <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.28em] text-navy/70">
-            Undangan Iwan &amp; Ica
+            Undangan Ica &amp; Iwan
           </p>
         </div>
 

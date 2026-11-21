@@ -197,10 +197,11 @@ export default function Rsvp({
                 <p className="mt-2 font-hand text-3xl text-ink">Ucapan yang masuk</p>
 
                 <ul className="no-scrollbar mt-6 max-h-[520px] space-y-4 overflow-y-auto pr-1">
-                  {cloudWishes.length === 0 && (
-                    <li className="text-sm text-ink/50">Jadilah yang pertama memberikan ucapan ♥</li>
+                  {/* Hanya ucapan berisi doa yang ditampilkan; RSVP tanpa pesan tidak masuk daftar. */}
+                  {cloudWishes.filter((w) => w.message.trim().length > 0).length === 0 && (
+                    <li className="text-sm text-ink/50">Jadilah yang pertama menuliskan doa dan ucapan ♥</li>
                   )}
-                  {cloudWishes.map((w, i) => (
+                  {cloudWishes.filter((w) => w.message.trim().length > 0).map((w, i) => (
                     <li key={`${w.name}-${i}`} className="border border-dashed border-ink/25 bg-paper px-5 py-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="font-hand text-2xl leading-none text-ink">{w.name}</p>
@@ -281,7 +282,7 @@ export default function Rsvp({
             <div className="relative aspect-[3/2] overflow-hidden bg-paper2">
               <img
                 src={closingPhoto || closing}
-                alt={`Foto penutup ${cfg.groomNick} & ${cfg.brideNick}`}
+                alt={`Foto penutup ${cfg.brideNick} & ${cfg.groomNick}`}
                 className="h-full w-full object-cover"
                 loading="lazy"
               />
