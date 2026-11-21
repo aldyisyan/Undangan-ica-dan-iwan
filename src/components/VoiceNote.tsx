@@ -36,7 +36,8 @@ export default function VoiceNote() {
     return `${m}:${String(sec).padStart(2, "0")}`;
   };
 
-  if (!cfg.showVoiceNote || !cfg.voiceNoteEnabled) return null;
+  // Cegah player rusak (0:00 tanpa suara) bila admin belum mengunggah file.
+  if (!cfg.showVoiceNote || !cfg.voiceNoteEnabled || !src) return null;
 
   return (
     <Reveal className="mx-auto max-w-md">

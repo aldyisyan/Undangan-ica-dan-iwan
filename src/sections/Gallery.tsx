@@ -1,44 +1,55 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { GALLERY, SECTION_PAD, WRAP } from "../lib/data";
+import { CUSTOM_PHOTOS, GALLERY, SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
 import { HeartDoodle, IconArrow, IconClose, Reveal, SectionHead } from "../lib/ui";
 
-/** Resolve a single gallery photo */
+type GalleryEntry = { src: string; caption: string; ratio: string; fallback: string };
+
+/** Cek apakah sebuah file benar-benar bisa dimuat (dipakai untuk folder /custom). */
+function probe(src: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = src;
+  });
+}
+
+/**
+ * Resolve a single gallery photo.
+ * Bila foto kustom belum/tidak bisa dimuat (mis. blob belum tersinkron ke
+ * perangkat tamu), tampilkan foto bawaan — TIDAK pernah menyisakan lubang kosong.
+ */
 function GalleryItem({
-  src,
-  caption,
-  ratio,
+  entry,
   idx,
   onOpen,
 }: {
-  src: string;
-  caption: string;
-  ratio: string;
+  entry: GalleryEntry;
   idx: number;
   onOpen: (i: number) => void;
 }) {
-  const resolved = useMediaSrc(src);
-  if (!resolved) return null;
+  const resolved = useMediaSrc(entry.src) || entry.fallback;
   return (
     <Reveal delay={idx * 70} className="mb-5 break-inside-avoid">
       <button
         type="button"
         onClick={() => onOpen(idx)}
         className="group relative block w-full overflow-hidden bg-paper2 text-left"
-        aria-label={`Buka foto: ${caption}`}
+        aria-label={`Buka foto: ${entry.caption}`}
       >
         <img
           src={resolved}
-          alt={caption}
+          alt={entry.caption}
           loading="lazy"
-          className={`w-full ${ratio} object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]`}
+          className={`w-full ${entry.ratio} object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]`}
         />
         <span
           aria-hidden
           className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent"
         />
-        <span className="absolute bottom-3 left-4 right-4 font-note text-sm text-paper">{caption}</span>
+        <span className="absolute bottom-3 left-4 right-4 font-note text-sm text-paper">{entry.caption}</span>
         <span
           aria-hidden
           className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full border border-paper/50 bg-ink/30 text-paper opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -55,26 +66,42 @@ function GalleryItem({
 export default function Gallery() {
   const cfg = useAdminConfig();
 
-  // Replace built-in default gallery completely when admin has uploaded custom photos
-  const items = useMemo(() => {
-    const customPhotos = Array.isArray(cfg.galleryPhotos)
-      ? cfg.galleryPhotos.filter((src): src is string => typeof src === "string" && src.trim().length > 0)
-      : [];
+  /* 1. Foto kustom dari tab Media */
+  const configCustom = useMemo(() => {
+    if (!Array.isArray(cfg.galleryPhotos)) return [] as string[];
+    return cfg.galleryPhotos.filter((s): s is string => typeof s === "string" && s.trim().length > 0);
+  }, [cfg.galleryPhotos]);
 
-    if (customPhotos.length > 0) {
-      return customPhotos.map((src, i) => ({
+  /* 2. Kalau admin belum upload lewat tab Media, coba folder /custom (lihat README) */
+  const [folder, setFolder] = useState<GalleryEntry[]>([]);
+  useEffect(() => {
+    if (configCustom.length > 0) { setFolder([]); return; }
+    let alive = true;
+    Promise.all(
+      CUSTOM_PHOTOS.map((p) =>
+        probe(p.src).then((ok) =>
+          ok ? ({ src: p.src, caption: p.caption, ratio: p.ratio, fallback: GALLERY[0].src } as GalleryEntry) : null
+        )
+      )
+    ).then((list) => {
+      if (alive) setFolder(list.filter((x): x is GalleryEntry => x !== null));
+    });
+    return () => { alive = false; };
+  }, [configCustom]);
+
+  const items = useMemo<GalleryEntry[]>(() => {
+    const fb = (i: number) => GALLERY[i % GALLERY.length].src;
+    if (configCustom.length > 0) {
+      return configCustom.map((src, i) => ({
         src,
         caption: `Foto ${i + 1}`,
         ratio: "aspect-[4/5]",
+        fallback: fb(i),
       }));
     }
-
-    return GALLERY.map((g) => ({
-      src: g.src,
-      caption: g.caption,
-      ratio: g.ratio,
-    }));
-  }, [cfg.galleryPhotos]);
+    if (folder.length > 0) return folder;
+    return GALLERY.map((g) => ({ src: g.src, caption: g.caption, ratio: g.ratio, fallback: g.src }));
+  }, [configCustom, folder]);
 
   const [open, setOpen] = useState<number | null>(null);
   const move = useCallback(
@@ -103,8 +130,10 @@ export default function Gallery() {
     };
   }, [open, close, move, items]);
 
-  // Resolve open image
-  const openSrc = useMediaSrc(open !== null && items[open] ? items[open].src : undefined);
+  // Resolve open image — jatuhkan ke foto bawaan bila belum termuat
+  const openEntry = open !== null && items[open] ? items[open] : null;
+  const openResolved = useMediaSrc(openEntry?.src);
+  const openSrc = openResolved || openEntry?.fallback || "";
 
   return (
     <section id="galeri" className={`${SECTION_PAD} relative overflow-hidden`}>
@@ -113,7 +142,7 @@ export default function Gallery() {
 
         <div className="mt-12 columns-1 gap-4 sm:columns-2 lg:columns-3">
           {items.map((g, i) => (
-            <GalleryItem key={`${g.src}-${i}`} src={g.src} caption={g.caption} ratio={g.ratio} idx={i} onOpen={setOpen} />
+            <GalleryItem key={`${g.src}-${i}`} entry={g} idx={i} onOpen={setOpen} />
           ))}
 
           {/* quote card */}

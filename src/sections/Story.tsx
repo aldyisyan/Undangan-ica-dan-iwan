@@ -1,13 +1,20 @@
 import { DRESS_SWATCHES, SECTION_PAD, STORY, WRAP } from "../lib/data";
+import { useAdminConfig } from "../lib/adminSettings";
+import { useMediaSrc } from "../lib/mediaStore";
 import { HeartDoodle, Reveal, RoughFrame, SectionHead, Sprig } from "../lib/ui";
 
-function StoryVisual({ item }: { item: (typeof STORY)[number] }) {
-  if (item.img) {
+function StoryVisual({ item, index }: { item: (typeof STORY)[number]; index: number }) {
+  const cfg = useAdminConfig();
+  const customRef = Array.isArray(cfg.storyPhotos) ? cfg.storyPhotos[index] || "" : "";
+  const resolvedCustom = useMediaSrc(customRef);
+  const img = resolvedCustom || item.img || "";
+
+  if (img) {
     return (
       <div className="polaroid relative mx-auto w-full max-w-[290px] rotate-[-2.5deg] p-3 pb-9 transition-transform duration-500 hover:rotate-0 md:mx-0">
         <span className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden />
         <div className="aspect-[4/5] overflow-hidden bg-paper2">
-          <img src={item.img} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
+          <img src={img} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
         </div>
         <p className="mt-3 text-center font-note text-sm text-terra">{item.caption}</p>
       </div>
@@ -111,7 +118,7 @@ export default function Story({
                           leftSide ? "md:items-end" : "md:items-start"
                         }`}
                       >
-                        <StoryVisual item={item} />
+                        <StoryVisual item={item} index={i} />
                         <div className={`max-w-sm ${leftSide ? "md:text-right" : ""}`}>
                           <p className="font-hand text-5xl leading-none text-terra">{item.year}</p>
                           <h3 className="mt-1.5 font-hand text-3xl leading-tight text-ink">

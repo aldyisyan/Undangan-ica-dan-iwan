@@ -1,6 +1,11 @@
 /**
  * Admin settings — konfigurasi yang bisa diubah dari halaman admin
  * dan disinkronisasi ke Supabase Storage.
+ *
+ * PENTING: setiap perubahan lokal menaikkan `updatedAt`. Saat cloud di-pull,
+ * konfigurasi remote HANYA diterapkan bila `updatedAt` remote tidak lebih lama
+ * dari lokal. Ini mencegah settings.json yang basi menimpa foto/setting yang
+ * baru saja di-upload admin (kasus "file sudah di-upload tapi web tetap default").
  */
 import { useSyncExternalStore } from "react";
 
@@ -67,8 +72,17 @@ export interface AdminConfig {
   /** Galeri foto */
   galleryPhotos: string[]; // array of "media:<key>" | URL
 
+  /** Foto Love Story — per indeks cerita; string kosong = pakai foto bawaan */
+  storyPhotos: string[];
+
   /** Pesan template WhatsApp undangan */
   waTemplate: string;
+
+  /**
+   * Epoch ms dari perubahan terakhir. Dipakai sebagai versi konfigurasi agar
+   * pull cloud yang basi tidak menimpa perubahan lokal yang lebih baru.
+   */
+  updatedAt: number;
 }
 
 const DEFAULT: AdminConfig = {
@@ -122,8 +136,11 @@ const DEFAULT: AdminConfig = {
 
   heroCoverPhoto: "",
   galleryPhotos: [],
+  storyPhotos: [],
 
   waTemplate: `Kepada Yth. {nama}\ndi tempat\n\nAssalamu'alaikum Warahmatullahi Wabarakatuh\n\nTanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara pernikahan kami:\n\n{mempelai}\n{tanggal}\n{lokasi}\n\nUndangan digital khusus untuk Anda dapat dibuka melalui tautan berikut:\n{link}\n\nMerupakan kehormatan bagi kami apabila Anda berkenan hadir.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh`,
+
+  updatedAt: 0,
 };
 
 const STORAGE_KEY = "rk-admin-config-v1";
@@ -146,21 +163,35 @@ function emit() { _listeners.forEach((l) => l()); }
 
 export function getAdminConfig(): AdminConfig { return _state; }
 
+/** Versi konfigurasi lokal saat ini (epoch ms). */
+export function getLocalVersion(): number {
+  return typeof _state.updatedAt === "number" && Number.isFinite(_state.updatedAt) ? _state.updatedAt : 0;
+}
+
 export function saveAdminConfig(next: Partial<AdminConfig>): void {
-  _state = { ..._state, ...next };
+  _state = { ..._state, ...next, updatedAt: Date.now() };
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); } catch { /* ignore */ }
   emit();
 }
 
+/**
+ * Terapkan konfigurasi dari cloud.
+ * Aman terhadap data basi: bawaan versi remote lebih lama dari lokal → dilewati.
+ */
 export function replaceAdminSettings(remote: Record<string, unknown>): void {
+  const remoteVersion = Number.isFinite(Number(remote.updatedAt)) ? Number(remote.updatedAt) : 0;
+  if (remoteVersion < getLocalVersion()) return; // lokal lebih baru — jangan ditimpa
+
   _state = { ...DEFAULT, ...(_state), ...(remote as Partial<AdminConfig>) };
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); } catch { /* ignore */ }
   emit();
 }
 
 export function resetAdminConfig(): void {
-  _state = { ...DEFAULT };
+  _state = { ...DEFAULT, updatedAt: Date.now() };
   try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+  // tetap simpan versi agar pull cloud berikutnya tidak menghidupkan lagi data lama
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); } catch { /* ignore */ }
   emit();
 }
 

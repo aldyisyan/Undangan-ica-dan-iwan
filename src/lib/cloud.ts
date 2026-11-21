@@ -107,6 +107,7 @@ function collectMediaRefs(s: Record<string, unknown>): string[] {
   push(s.musicSrc);
   push(s.voiceNoteSrc);
   if (Array.isArray(s.galleryPhotos)) (s.galleryPhotos as string[]).forEach((g) => push(g));
+  if (Array.isArray(s.storyPhotos)) (s.storyPhotos as string[]).forEach((g) => push(g));
   return [...new Set(refs)];
 }
 

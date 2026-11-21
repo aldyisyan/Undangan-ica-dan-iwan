@@ -215,8 +215,7 @@ export default function Rsvp({
       <section id="penutup" className={`${SECTION_PAD} relative overflow-hidden pb-16`}>
         <div className={WRAP}>
           <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-navy/70">09 &mdash; Terima Kasih</p>
-            <h2 className="mt-4 font-hand text-[clamp(2.6rem,9vw,4.4rem)] leading-none text-ink">Terima Kasih</h2>
+            <h2 className="font-hand text-[clamp(2.6rem,9vw,4.4rem)] leading-none text-ink">Terima Kasih</h2>
             <div className="mt-3 flex justify-center"><DoodleDivider /></div>
             <p className="mt-6 text-[15px] leading-[1.9] text-ink/75">
               Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak, Ibu, Saudara, dan Saudari berkenan hadir untuk memberikan doa restu.

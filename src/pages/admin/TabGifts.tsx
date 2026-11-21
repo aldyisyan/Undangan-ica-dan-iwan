@@ -1,13 +1,7 @@
-import { useState } from "react";
 import { useAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
-import { getCloudAdmin } from "../../lib/cloudConfig";
-import { syncToCloud } from "../../lib/cloud";
 
 export default function TabGifts() {
   const cfg = useAdminConfig();
-  const [toast, setToast] = useState("");
-
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
   const updateGift = (i: number, field: string, value: string) => {
     const gifts = [...cfg.gifts];
@@ -20,13 +14,6 @@ export default function TabGifts() {
   const removeGift = (i: number) => {
     const gifts = cfg.gifts.filter((_, idx) => idx !== i);
     saveAdminConfig({ gifts });
-  };
-
-  const sync = async () => {
-    const admin = getCloudAdmin();
-    if (!admin) { showToast("Hubungkan ke Supabase dulu di tab Cloud."); return; }
-    const ok = await syncToCloud(admin, cfg as unknown as Record<string, unknown>);
-    showToast(ok ? "✓ Tersinkronisasi ke cloud!" : "Gagal sync. Cek koneksi.");
   };
 
   const KINDS = ["Rekening Tabungan", "Kartu Kredit", "Dompet Digital (GoPay)", "Dompet Digital (OVO)", "Dompet Digital (DANA)", "PayPal"];
@@ -74,10 +61,11 @@ export default function TabGifts() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <button type="button" onClick={addGift} className="admin-btn">+ Tambah Rekening</button>
-        <button type="button" onClick={sync} className="admin-btn-primary">Simpan &amp; Sync ke Cloud</button>
+        <button type="button" onClick={addGift} className="admin-btn-primary">+ Tambah Rekening</button>
       </div>
-      {toast && <p className="text-sm text-green-700">{toast}</p>}
+      <p className="text-[13px] text-ink/50">
+        Perubahan tersimpan otomatis dan disinkronkan ke cloud dalam beberapa detik.
+      </p>
     </div>
   );
 }

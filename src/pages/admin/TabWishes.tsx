@@ -54,7 +54,9 @@ export default function TabWishes() {
         </div>
       </div>
 
-      {toast && <p className="text-sm text-green-700">{toast}</p>}
+      {toast && (
+        <p className="border border-sage/50 bg-sage/10 px-4 py-2.5 text-sm text-ink">{toast}</p>
+      )}
 
       {wishes.length === 0 ? (
         <p className="text-sm text-ink/50">Belum ada ucapan masuk.</p>

@@ -1,6 +1,4 @@
 import { useAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
-import { getCloudAdmin } from "../../lib/cloudConfig";
-import { syncToCloud } from "../../lib/cloud";
 
 const SECTIONS = [
   { key: "showRsvp", label: "RSVP & Ucapan", desc: "Form konfirmasi kehadiran dan kolom ucapan tamu." },
@@ -18,14 +16,9 @@ type SectionKey = (typeof SECTIONS)[number]["key"];
 export default function TabSections() {
   const cfg = useAdminConfig();
 
-  const toggle = async (key: SectionKey) => {
+  const toggle = (key: SectionKey) => {
     const next = { [key]: !cfg[key] } as Parameters<typeof saveAdminConfig>[0];
     saveAdminConfig(next);
-    const admin = getCloudAdmin();
-    if (admin) {
-      const updated = { ...cfg, ...next };
-      await syncToCloud(admin, updated as unknown as Record<string, unknown>);
-    }
   };
 
   return (

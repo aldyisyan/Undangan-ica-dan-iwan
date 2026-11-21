@@ -123,7 +123,16 @@ export default function TabCloud() {
       )}
 
       {status && (
-        <div className={`rounded px-4 py-3 text-sm ${status.type === "ok" ? "bg-green-50 text-green-800" : status.type === "err" ? "bg-red-50 text-red-800" : "bg-blue-50 text-blue-800"}`}>
+        <div
+          role="status"
+          className={`border px-5 py-3.5 text-sm leading-relaxed ${
+            status.type === "ok"
+              ? "border-sage/50 bg-sage/10 text-sage"
+              : status.type === "err"
+              ? "border-terra/50 bg-terra/10 text-terra"
+              : "border-navy/40 bg-navy/10 text-navy"
+          }`}
+        >
           {status.msg}
         </div>
       )}

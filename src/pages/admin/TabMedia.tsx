@@ -4,8 +4,9 @@
  */
 import { useRef, useState } from "react";
 import { useAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
+import { STORY } from "../../lib/data";
 import { getCloudAdmin } from "../../lib/cloudConfig";
-import { syncToCloud } from "../../lib/cloud";
+import { syncNow } from "../../lib/autoSync";
 import { saveMedia, removeMedia, isMediaRef, mediaRef, useMediaSrc } from "../../lib/mediaStore";
 import MediaUpload from "./MediaUpload";
 import ImageCropper from "./ImageCropper";
@@ -48,9 +49,9 @@ export default function TabMedia() {
       return;
     }
     setSyncing(true);
-    const ok = await syncToCloud(admin, cfg as unknown as Record<string, unknown>);
+    const ok = await syncNow();
     setSyncing(false);
-    showToast(ok ? "✓ Media tersinkronisasi ke cloud!" : "Gagal sync. Cek koneksi.");
+    showToast(ok ? "✓ Media tersinkronisasi ke cloud!" : "Gagal sync. Cek koneksi & policy RLS.");
   };
 
   const addGalleryPhoto = async (file: File | Blob) => {
@@ -105,7 +106,9 @@ export default function TabMedia() {
         </button>
       </div>
 
-      {toast && <p className="rounded bg-green-50 px-4 py-2 text-sm text-green-800">{toast}</p>}
+      {toast && (
+        <p className="border border-sage/50 bg-sage/10 px-4 py-2.5 text-sm text-ink">{toast}</p>
+      )}
 
       {/* ───────── Cover / Hero ───────── */}
       <section className="space-y-4 border-t border-dashed border-ink/15 pt-8">
@@ -186,6 +189,37 @@ export default function TabMedia() {
             Hapus Semua Foto Galeri
           </button>
         )}
+      </section>
+
+      {/* ───────── Love Story ───────── */}
+      <section className="space-y-4 border-t border-dashed border-ink/15 pt-8">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.28em] text-terra">Foto Love Story</h3>
+        <p className="text-xs text-ink/55">
+          Foto untuk timeline &ldquo;Perjalanan Kami&rdquo;, dicrop ke rasio portrait <strong>4 : 5</strong>.
+          Kosongkan satu slot untuk kembali memakai ilustrasi bawaan tahun tersebut.
+        </p>
+        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+          {STORY.map((item, i) => (
+            <MediaUpload
+              key={item.year}
+              label={`${item.year} · ${item.title}`}
+              mediaKey={`story-${i}`}
+              currentValue={cfg.storyPhotos?.[i] || ""}
+              accept="image/*"
+              aspect={4 / 5}
+              cropShape="rect"
+              previewClass="h-44 w-full"
+              cropHint="Rasio portrait 4:5 — pas dengan bingkai polaroid di halaman undangan."
+              hint={item.img ? "Bawaan: ilustrasi bawaan." : "Belum ada foto bawaan — slot ini opsional."}
+              onSave={(ref) => {
+                const next = Array.isArray(cfg.storyPhotos) ? [...cfg.storyPhotos] : [];
+                while (next.length <= i) next.push("");
+                next[i] = ref;
+                saveAdminConfig({ storyPhotos: next });
+              }}
+            />
+          ))}
+        </div>
       </section>
 
       {/* ───────── Musik ───────── */}

@@ -2,7 +2,7 @@
  * Zona Berbahaya: reset pengaturan, hapus semua data lokal
  */
 import { useState } from "react";
-import { resetAdminConfig } from "../../lib/adminSettings";
+import { resetAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
 import { clearMedia } from "../../lib/mediaStore";
 import { wipeWishes } from "../../lib/wishes";
 import { clearGuestBook } from "../../lib/guestBook";
@@ -11,6 +11,7 @@ import { clearCloudAdmin } from "../../lib/cloudConfig";
 export default function TabDanger() {
   const [confirmText, setConfirmText] = useState("");
   const [done, setDone] = useState(false);
+  const [msg, setMsg] = useState("");
 
   const doReset = async () => {
     if (confirmText !== "RESET") return;
@@ -103,8 +104,18 @@ export default function TabDanger() {
         <div className="border border-dashed border-ink/25 bg-paper p-6">
           <h3 className="font-semibold text-ink">Putuskan Koneksi Cloud</h3>
           <p className="mt-1 text-sm text-ink/60">Menghapus kredensial Supabase dari perangkat ini saja. Data di cloud tidak terpengaruh.</p>
-          <button type="button" onClick={() => { clearCloudAdmin(); alert("Koneksi cloud diputus."); }}
-            className="mt-4 admin-btn-danger">Putuskan Cloud</button>
+          <button
+            type="button"
+            onClick={() => {
+              clearCloudAdmin();
+              saveAdminConfig({ supabaseUrl: "", supabaseBucket: "invite", supabaseAnonKey: "" });
+              setMsg("Koneksi cloud diputus dari perangkat ini.");
+            }}
+            className="mt-4 admin-btn-danger"
+          >
+            Putuskan Cloud
+          </button>
+          {msg && <p className="mt-3 font-note text-sm text-terra">{msg}</p>}
         </div>
       </div>
     </div>

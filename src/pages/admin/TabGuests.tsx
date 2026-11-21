@@ -68,7 +68,7 @@ function GuestRow({ g, cfg, onDelete, onSend, onCopy, showToast, pushCloud }: {
           {g.phone && <p className="text-[10px] text-ink/40">WA: {normalizeWaPhone(g.phone)}</p>}
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          {g.sentAt && <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-green-700">✓ Terkirim</span>}
+          {g.sentAt && <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/70">✓ Terkirim</span>}
           <button type="button" onClick={() => setExpanded((e) => !e)}
             className="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy/60 hover:text-terra">
             {expanded ? "▲ Tutup" : "⚙ Acara"}
@@ -231,7 +231,9 @@ export default function TabGuests() {
           onChange={(e) => { if (e.target.files?.[0]) importXlsx(e.target.files[0]); e.target.value = ""; }} />
       </div>
 
-      {toast && <p className="rounded bg-green-50 px-4 py-2 text-sm text-green-800">{toast}</p>}
+      {toast && (
+        <p className="border border-sage/50 bg-sage/10 px-4 py-2.5 text-sm text-ink">{toast}</p>
+      )}
 
       {/* ───── Setting global visibilitas acara ───── */}
       <div className="border border-dashed border-navy/30 bg-navy/5 px-5 py-5">
