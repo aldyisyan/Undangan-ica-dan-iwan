@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { disposeMusic, music } from "./lib/music";
+import { disposeMusic, music, setMusicStateListener, syncMusicSource } from "./lib/music";
+import { useMediaSrc } from "./lib/mediaStore";
 import { IconMusic } from "./lib/ui";
 import Cover from "./sections/Cover";
 import DateEvents from "./sections/DateEvents";
@@ -28,6 +29,7 @@ export default function App() {
   const isAdmin = useIsAdmin();
   const guestParam = useGuestParam();
   const cfg = useAdminConfig();
+  const resolvedMusicUrl = useMediaSrc(cfg.musicSrc);
 
   const [opened, setOpened] = useState(false);
   const [burst, setBurst] = useState(false);
@@ -62,12 +64,8 @@ export default function App() {
         }
       }
 
-      // initial pull tetap boleh, termasuk di admin route
       if (getCloudRead()) await pullFromCloud().catch(() => {});
 
-      // IMPORTANT FIX:
-      // Saat admin sedang mengedit, jangan auto-pull berkala dari cloud
-      // karena bisa menimpa perubahan lokal yang baru dibuat dengan data cloud lama.
       if (!isAdmin) {
         timer = window.setInterval(() => {
           if (getCloudRead()) pullFromCloud().catch(() => {});
@@ -78,7 +76,7 @@ export default function App() {
     boot();
 
     const onVisible = () => {
-      if (isAdmin) return; // admin route tidak auto-pull saat fokus/visible
+      if (isAdmin) return;
       if (document.visibilityState === "visible" && getCloudRead()) pullFromCloud().catch(() => {});
     };
 
@@ -94,7 +92,23 @@ export default function App() {
     };
   }, [isAdmin]);
 
-  useEffect(() => { if (isAdmin) return; document.body.style.overflow = opened ? "" : "hidden"; return () => { document.body.style.overflow = ""; }; }, [opened, isAdmin]);
+  /* ---- sinkronkan perubahan musik kustom secara reaktif ---- */
+  useEffect(() => {
+    setMusicStateListener((nextPlaying) => setPlaying(nextPlaying));
+    return () => setMusicStateListener(null);
+  }, []);
+
+  useEffect(() => {
+    void syncMusicSource(resolvedMusicUrl);
+  }, [resolvedMusicUrl]);
+
+  useEffect(() => {
+    if (isAdmin) return;
+    document.body.style.overflow = opened ? "" : "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [opened, isAdmin]);
 
   useEffect(() => {
     if (!opened || isAdmin) return;
@@ -110,13 +124,25 @@ export default function App() {
     setOpened(true);
     setBurst(true);
     window.setTimeout(() => setBurst(false), 3200);
-    try { setPlaying(await music.start()); } catch { setPlaying(false); }
-    window.setTimeout(() => { document.getElementById("salam")?.scrollIntoView({ behavior: "smooth", block: "start" }); }, 700);
-  }, []);
+    await syncMusicSource(resolvedMusicUrl);
+    try {
+      setPlaying(await music.start());
+    } catch {
+      setPlaying(false);
+    }
+    window.setTimeout(() => {
+      document.getElementById("salam")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 700);
+  }, [resolvedMusicUrl]);
 
   const toggleMusic = useCallback(async () => {
-    try { setPlaying(await music.toggle()); } catch { setPlaying(false); }
-  }, []);
+    await syncMusicSource(resolvedMusicUrl);
+    try {
+      setPlaying(await music.toggle());
+    } catch {
+      setPlaying(false);
+    }
+  }, [resolvedMusicUrl]);
 
   if (isAdmin) return <AdminPage />;
 
@@ -126,7 +152,9 @@ export default function App() {
       <FloatingAccents />
 
       {/* sticky header */}
-      <header className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${opened && scrolled ? "translate-y-0 border-b border-dashed border-ink/20 bg-paper/90 backdrop-blur-sm" : "-translate-y-full opacity-0"}`}>
+      <header
+        className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${opened && scrolled ? "translate-y-0 border-b border-dashed border-ink/20 bg-paper/90 backdrop-blur-sm" : "-translate-y-full opacity-0"}`}
+      >
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-5 py-3">
           <a href="#cover" className="font-hand text-2xl leading-none text-ink">
             {cfg.groomNick} <span className="text-terra">&amp;</span> {cfg.brideNick}
@@ -154,10 +182,17 @@ export default function App() {
 
       {/* floating music button */}
       {opened && (
-        <button type="button" onClick={toggleMusic} aria-pressed={playing}
+        <button
+          type="button"
+          onClick={toggleMusic}
+          aria-pressed={playing}
           aria-label={playing ? "Matikan musik" : "Nyalakan musik"}
-          className="group fixed bottom-5 right-5 z-50 grid h-12 w-12 place-items-center rounded-full border border-ink/25 bg-paper text-ink shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-terra hover:text-terra sm:bottom-7 sm:right-7 sm:h-14 sm:w-14">
-          <span aria-hidden className={`absolute -inset-1.5 rounded-full border border-dashed transition-colors duration-300 ${playing ? "spin-slow border-terra/70" : "border-ink/20"}`} />
+          className="group fixed bottom-5 right-5 z-50 grid h-12 w-12 place-items-center rounded-full border border-ink/25 bg-paper text-ink shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-terra hover:text-terra sm:bottom-7 sm:right-7 sm:h-14 sm:w-14"
+        >
+          <span
+            aria-hidden
+            className={`absolute -inset-1.5 rounded-full border border-dashed transition-colors duration-300 ${playing ? "spin-slow border-terra/70" : "border-ink/20"}`}
+          />
           <IconMusic playing={playing} className="h-5 w-5" />
         </button>
       )}
