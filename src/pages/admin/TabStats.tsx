@@ -3,7 +3,7 @@
  * ringkasan RSVP, pengiriman undangan, ucapan terbaru, dan pintasan cepat.
  */
 import { useState } from "react";
-import { useWishes } from "../../lib/wishes";
+import { hasResponded, useWishes } from "../../lib/wishes";
 import { useGuestBook } from "../../lib/guestBook";
 import { pullFromCloud } from "../../lib/cloud";
 import { getCloudAdmin, getCloudRead } from "../../lib/cloudConfig";
@@ -33,9 +33,9 @@ export default function TabStats({ onNavigate }: { onNavigate?: (tab: string) =>
   const tidak = wishes.filter((w) => w.attend === "tidak");
   const totalHadir = hadir.reduce((s, w) => s + (w.count ?? 1), 0);
   const sentGuests = guests.filter((g) => g.sentAt).length;
-  const noResponse = guests.filter(
-    (g) => g.sentAt && !wishes.find((w) => w.name.toLowerCase().includes(g.name.toLowerCase()))
-  );
+  // Cocokkan longgar (lihat hasResponded) agar tamu yang sudah merespons
+  // tidak salah tercatat "belum respons" hanya karena penulisan namanya beda.
+  const noResponse = guests.filter((g) => g.sentAt && !hasResponded(g.name, wishes));
   const pct = wishes.length ? Math.round((hadir.length / wishes.length) * 100) : 0;
   const cloudReady = !!getCloudAdmin();
 

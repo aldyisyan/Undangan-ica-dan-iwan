@@ -145,9 +145,14 @@ export async function syncToCloud(
     if (!ok) return false;
     onProgress?.(++done, total);
 
-    // 4. Upload wishes.json
-    await uploadObject(admin, "site/wishes.json",
-      new Blob([JSON.stringify(loadWishes())], { type: "application/json" }), "application/json; charset=utf-8");
+    // 4. Upload wishes.json — SELALU MERGE dengan remote.
+    //    Tanpa merge, sync otomatis akan menimpa ucapan/RSVP yang masuk dari
+    //    perangkat tamu lain sehingga tamu dianggap "belum respons".
+    const remoteWishes = await fetchRemoteWishes(admin);
+    const mergedWishes = mergeWishes(loadWishes(), remoteWishes ?? []);
+    const wishesOk = await uploadObject(admin, "site/wishes.json",
+      new Blob([JSON.stringify(mergedWishes)], { type: "application/json" }), "application/json; charset=utf-8");
+    if (wishesOk) replaceWishesFromCloud(mergedWishes);
     onProgress?.(++done, total);
 
     // 5. Upload guests.json

@@ -58,3 +58,53 @@ export function removeWish(w: Wish): Wish[] {
   return next;
 }
 export function wipeWishes(): void { _commit([]); }
+
+/* ------------------------------------------------------- pencocokan nama */
+
+const HONORIFIC = new Set([
+  "bpk", "bapak", "ibu", "pak", "bu", "dr", "drs", "prof", "sh", "sm", "mh",
+  "saudara", "saudari", "mr", "mrs", "ms", "miss", "and", "dan", "the", "an",
+]);
+
+function normalizeName(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function nameTokens(s: string): string[] {
+  return normalizeName(s).split(" ").filter((t) => t.length > 1 && !HONORIFIC.has(t));
+}
+
+/**
+ * Apakah tamu ini sudah mengirim ucapan/RSVP?
+ *
+ * Pencocokan longgar supaya tidak ada tamu yang salah tercatat "belum respons":
+ *  - persis sama setelah normalisasi
+ *  - salah satu mengandung yang lain
+ *  - seluruh token nama paling pendek cocok di nama lainnya
+ *
+ * Contoh yang sebelumnya gagal: "Bapak Hendra (Kantor)" vs "Hendra",
+ * "Ibu Sinta Maharani" vs "Sinta Maharani", "Rani & Dimas" vs "Rani dan Dimas".
+ */
+export function hasResponded(guestName: string, wishes: Wish[]): boolean {
+  const g = normalizeName(guestName);
+  if (!g) return false;
+  const gt = nameTokens(guestName);
+
+  return wishes.some((w) => {
+    const wn = normalizeName(w.name);
+    if (!wn) return false;
+    if (wn === g) return true;
+    if (wn.includes(g) || g.includes(wn)) return true;
+
+    const wt = nameTokens(w.name);
+    if (gt.length === 0 || wt.length === 0) return false;
+    const overlap = gt.filter((t) => wt.includes(t)).length;
+    return overlap > 0 && overlap >= Math.min(gt.length, wt.length);
+  });
+}

@@ -8,6 +8,7 @@ import { getCloudAdmin } from "../../lib/cloudConfig";
 import { pushGuestBookToCloud, pullFromCloud } from "../../lib/cloud";
 import { useAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
 import { buildEventParams } from "../../lib/eventVisibility";
+import { useWishes, hasResponded } from "../../lib/wishes";
 import * as XLSX from "xlsx";
 
 /* ---- badge warna ---- */
@@ -29,6 +30,10 @@ function GuestRow({ g, cfg, onDelete, onSend, onCopy, showToast, pushCloud }: {
   pushCloud: (list?: InviteGuest[]) => Promise<void>;
 }) {
   const [expanded, setExpanded] = useState(false);
+
+  /* sudah merespons RSVP? dicocokkan longgar supaya tidak salah status */
+  const wishes = useWishes();
+  const responded = hasResponded(g.name, wishes);
 
   /* resolve visibilitas: pakai override tamu jika ada, else global */
   const showAkad = g.events?.showAkad ?? cfg.globalShowAkad;
@@ -62,12 +67,21 @@ function GuestRow({ g, cfg, onDelete, onSend, onCopy, showToast, pushCloud }: {
             {/* badge acara */}
             <span className={`rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.1em] ${showAkad ? "bg-navy/15 text-navy" : "bg-ink/8 text-ink/35 line-through"}`}>Akad</span>
             <span className={`rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.1em] ${showResepsi ? "bg-terra/15 text-terra" : "bg-ink/8 text-ink/35 line-through"}`}>Resepsi</span>
-            {hasOverride && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.1em] text-amber-700">Override</span>}
+            {hasOverride && <span className="rounded-full border border-navy/40 bg-navy/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.1em] text-navy">Override</span>}
           </div>
           <p className="mt-0.5 truncate font-mono text-[10px] text-ink/40">{link}</p>
           {g.phone && <p className="text-[10px] text-ink/40">WA: {normalizeWaPhone(g.phone)}</p>}
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {responded ? (
+            <span className="rounded-full border border-sage/50 bg-sage/10 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-ink/80">
+              ✓ Sudah respons
+            </span>
+          ) : (
+            <span className="rounded-full border border-terra/45 bg-terra/[0.07] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-terra">
+              Belum respons
+            </span>
+          )}
           {g.sentAt && <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/70">✓ Terkirim</span>}
           <button type="button" onClick={() => setExpanded((e) => !e)}
             className="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy/60 hover:text-terra">
