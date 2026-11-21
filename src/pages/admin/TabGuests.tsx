@@ -5,7 +5,7 @@ import {
   normalizeWaPhone, DEFAULT_WA_TEMPLATE, setGuestEvents, type InviteGuest,
 } from "../../lib/guestBook";
 import { getCloudAdmin } from "../../lib/cloudConfig";
-import { pushGuestBookToCloud, forceReplaceGuestBookCloud, pullFromCloud } from "../../lib/cloud";
+import { pushGuestBookToCloud, pullFromCloud } from "../../lib/cloud";
 import { useAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
 import { buildEventParams } from "../../lib/eventVisibility";
 import { useWishes, hasResponded } from "../../lib/wishes";
@@ -145,7 +145,7 @@ export default function TabGuests() {
 
   const forcePushCloud = async (list: InviteGuest[]) => {
     const admin = getCloudAdmin();
-    if (admin) await forceReplaceGuestBookCloud(admin, list);
+    if (admin) await pushGuestBookToCloud(admin, list);
   };
 
   const add = async (e: FormEvent) => {

@@ -4,7 +4,6 @@ import { SECTION_PAD, WRAP } from "../lib/data";
 import { useAdminConfig } from "../lib/adminSettings";
 import { useMediaSrc } from "../lib/mediaStore";
 import { useWishes, addWish, type Wish } from "../lib/wishes";
-import { getCloudAdmin } from "../lib/cloudConfig";
 import { pushWishesToCloud } from "../lib/cloud";
 import {
   DoodleDivider,
@@ -69,9 +68,14 @@ export default function Rsvp({
       message: withoutMsg ? "" : message.trim(),
       at: Date.now(),
     };
+    
+    // Simpan ke lokal dulu supaya tamu merasa langsung sukses
     addWish(wish);
-    const admin = getCloudAdmin();
-    if (admin) await pushWishesToCloud(admin, [wish, ...cloudWishes]);
+
+    // pushWishesToCloud memakai getWritableCloud() di dalamnya (pakai anonKey dari cloud.json)
+    // sehingga bekerja di perangkat TAMU sekalipun (bukan hanya admin).
+    await pushWishesToCloud(null, wish);
+    
     const wasWithout = withoutMsg;
     setName(""); setMessage(""); setGuestCount(MAX_GUESTS); setAttend("Hadir"); setWithoutMsg(false);
     showToast(wasWithout ? "Terima kasih, konfirmasi kehadiran Anda tersimpan ♥" : "Terima kasih, ucapan Anda tersimpan ♥");

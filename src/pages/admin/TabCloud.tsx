@@ -87,6 +87,19 @@ export default function TabCloud() {
             </code>
           </li>
         </ol>
+        <div className="mt-4 border-t border-navy/15 pt-4">
+          <p className="font-semibold text-terra">⚠ Penting — Agar RSVP dari HP Tamu Tersimpan ke Cloud:</p>
+          <p className="mt-1 text-ink/70">
+            Saat Anda menekan <strong>Push ke Cloud</strong>, sistem menyimpan
+            {" "}<code className="rounded bg-ink/10 px-1">anon public key</code> ke{" "}
+            <code className="rounded bg-ink/10 px-1">site/cloud.json</code> di bucket.
+            Perangkat tamu membaca file ini saat membuka link, sehingga ucapan RSVP langsung
+            masuk ke Supabase — bukan hanya tersimpan di lokal HP tamu.
+          </p>
+          <p className="mt-1 font-semibold text-navy/80">
+            Anon public key aman dipublikasikan — Supabase memang merancangnya untuk ini.
+          </p>
+        </div>
       </div>
 
       <form onSubmit={save} className="space-y-5">

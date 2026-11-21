@@ -53,11 +53,16 @@ export default function App() {
       if (shortMatch) {
         const ref = decodeURIComponent(shortMatch[1]).trim();
         const existing = getCloudRead();
-        if (!existing || !existing.anonKey) {
+        // Selalu resolve cloud.json untuk mendapatkan anonKey terbaru.
+        // anonKey di cloud.json bersifat PUBLIK dan aman dibaca oleh siapa pun.
+        // Tanpa anonKey ini, perangkat tamu tidak bisa push ucapan RSVP ke Supabase.
+        if (!existing?.anonKey) {
           const full = await resolveCloudFromRef(ref);
           if (full) {
-            saveCloudRead(full);
-            if (full.anonKey && !getCloudAdmin()) saveCloudAdmin({ url: full.url, bucket: full.bucket, anonKey: full.anonKey });
+            saveCloudRead(full); // simpan termasuk anonKey agar tamu bisa push
+            if (full.anonKey && !getCloudAdmin()) {
+              saveCloudAdmin({ url: full.url, bucket: full.bucket, anonKey: full.anonKey });
+            }
           } else {
             saveCloudRead({ url: `https://${ref}.supabase.co`, bucket: "invite" });
           }
@@ -66,7 +71,9 @@ export default function App() {
         const c = decodeCloudParam(longMatch[1]);
         if (c) {
           saveCloudRead(c);
-          if (c.anonKey && !getCloudAdmin()) saveCloudAdmin({ url: c.url, bucket: c.bucket, anonKey: c.anonKey });
+          if (c.anonKey && !getCloudAdmin()) {
+            saveCloudAdmin({ url: c.url, bucket: c.bucket, anonKey: c.anonKey });
+          }
         }
       }
 
