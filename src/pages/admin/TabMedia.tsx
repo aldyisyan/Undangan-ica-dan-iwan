@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { useAdminConfig, saveAdminConfig } from "../../lib/adminSettings";
 import { getCloudAdmin } from "../../lib/cloudConfig";
 import { syncToCloud } from "../../lib/cloud";
-import { saveMedia, mediaRef, useMediaSrc } from "../../lib/mediaStore";
+import { saveMedia, removeMedia, isMediaRef, mediaRef, useMediaSrc } from "../../lib/mediaStore";
 import MediaUpload from "./MediaUpload";
 import ImageCropper from "./ImageCropper";
 
@@ -17,8 +17,12 @@ function GalleryThumb({ src, onRemove }: { src: string; onRemove: () => void }) 
     <div className="relative aspect-[4/5] overflow-hidden bg-paper2 group">
       {resolved && <img src={resolved} alt="" className="h-full w-full object-cover" />}
       {!resolved && <div className="h-full w-full animate-pulse bg-ink/10" />}
-      <button type="button" onClick={onRemove}
-        className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-ink/70 text-paper opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+      <button
+        type="button"
+        onClick={onRemove}
+        title="Hapus foto ini"
+        className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-ink/70 text-paper opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+      >
         <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
           <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
@@ -32,11 +36,17 @@ export default function TabMedia() {
   const [toast, setToast] = useState("");
   const [syncing, setSyncing] = useState(false);
 
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3000);
+  };
 
   const sync = async () => {
     const admin = getCloudAdmin();
-    if (!admin) { showToast("Hubungkan ke Supabase dulu di tab Cloud."); return; }
+    if (!admin) {
+      showToast("Hubungkan ke Supabase dulu di tab Cloud.");
+      return;
+    }
     setSyncing(true);
     const ok = await syncToCloud(admin, cfg as unknown as Record<string, unknown>);
     setSyncing(false);
@@ -47,11 +57,36 @@ export default function TabMedia() {
     const key = `gallery-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     await saveMedia(key, file);
     const ref = mediaRef(key);
-    saveAdminConfig({ galleryPhotos: [...cfg.galleryPhotos, ref] });
+    const current = Array.isArray(cfg.galleryPhotos) ? cfg.galleryPhotos : [];
+    saveAdminConfig({ galleryPhotos: [...current, ref] });
+    showToast("✓ Foto ditambahkan ke galeri.");
   };
 
-  const removeGalleryPhoto = (idx: number) => {
-    saveAdminConfig({ galleryPhotos: cfg.galleryPhotos.filter((_, i) => i !== idx) });
+  const removeGalleryPhoto = async (idx: number) => {
+    const current = Array.isArray(cfg.galleryPhotos) ? cfg.galleryPhotos : [];
+    const target = current[idx];
+    const nextPhotos = current.filter((_, i) => i !== idx);
+    saveAdminConfig({ galleryPhotos: nextPhotos });
+    if (target && isMediaRef(target)) {
+      await removeMedia(target.slice(6));
+    }
+    showToast(
+      nextPhotos.length === 0
+        ? "Foto dihapus. Galeri kembali menampilkan foto bawaan."
+        : "Foto dihapus dari galeri."
+    );
+  };
+
+  const clearAllGalleryPhotos = async () => {
+    if (!confirm("Hapus semua foto galeri kustom? Galeri akan kembali ke foto bawaan.")) return;
+    const current = Array.isArray(cfg.galleryPhotos) ? [...cfg.galleryPhotos] : [];
+    saveAdminConfig({ galleryPhotos: [] });
+    await Promise.all(
+      current
+        .filter((ref) => isMediaRef(ref))
+        .map((ref) => removeMedia(ref.slice(6)))
+    );
+    showToast("Semua foto kustom dihapus. Galeri kembali ke foto bawaan.");
   };
 
   return (
@@ -133,7 +168,7 @@ export default function TabMedia() {
           Galeri Foto ({cfg.galleryPhotos.length} foto)
         </h3>
         <p className="text-xs text-ink/55">
-          Foto-foto ini tampil di section Galeri, menggantikan ilustrasi bawaan.
+          Foto-foto ini tampil di section Galeri, menggantikan ilustrasi bawaan sepenuhnya.
           Setiap foto akan dicrop ke rasio portrait <strong>4 : 5</strong>.
         </p>
 
@@ -147,8 +182,9 @@ export default function TabMedia() {
         </div>
 
         {cfg.galleryPhotos.length > 0 && (
-          <button type="button" onClick={() => { if (confirm("Hapus semua foto galeri?")) saveAdminConfig({ galleryPhotos: [] }); }}
-            className="admin-btn-danger text-[10px]">Hapus Semua Foto Galeri</button>
+          <button type="button" onClick={clearAllGalleryPhotos} className="admin-btn-danger text-[10px]">
+            Hapus Semua Foto Galeri
+          </button>
         )}
       </section>
 
@@ -199,9 +235,16 @@ export default function TabMedia() {
 
 function ToggleBtn({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
   return (
-    <button type="button" onClick={() => onChange(!value)} role="switch" aria-checked={value}
-      className={`relative h-7 w-14 shrink-0 rounded-full border-2 transition-all duration-300 ${value ? "border-terra bg-terra" : "border-ink/30 bg-ink/10"}`}>
-      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-paper shadow transition-transform duration-300 ${value ? "translate-x-7" : "translate-x-0.5"}`} />
+    <button
+      type="button"
+      onClick={() => onChange(!value)}
+      role="switch"
+      aria-checked={value}
+      className={`relative h-7 w-14 shrink-0 rounded-full border-2 transition-all duration-300 ${value ? "border-terra bg-terra" : "border-ink/30 bg-ink/10"}`}
+    >
+      <span
+        className={`absolute top-0.5 h-5 w-5 rounded-full bg-paper shadow transition-transform duration-300 ${value ? "translate-x-7" : "translate-x-0.5"}`}
+      />
     </button>
   );
 }
@@ -210,8 +253,11 @@ function FieldText({ label, value, onChange }: { label: string; value: string; o
   return (
     <div>
       <label className="block text-[10px] font-semibold uppercase tracking-[0.24em] text-navy/70">{label}</label>
-      <input value={value} onChange={(e) => onChange(e.target.value)}
-        className="mt-2 w-full border-b border-ink/25 bg-transparent py-2.5 text-sm text-ink outline-none focus:border-terra" />
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-2 w-full border-b border-ink/25 bg-transparent py-2.5 text-sm text-ink outline-none focus:border-terra"
+      />
     </div>
   );
 }
@@ -223,8 +269,6 @@ function GalleryAddButton({ onAdd }: { onAdd: (blob: Blob) => void }) {
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  /* ImageCropper dipakai langsung — import di atas */
-
   const handleFile = (file: File) => {
     const url = URL.createObjectURL(file);
     setCropSrc(url);
@@ -234,15 +278,27 @@ function GalleryAddButton({ onAdd }: { onAdd: (blob: Blob) => void }) {
     <>
       <label
         className="flex aspect-[4/5] cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed border-ink/20 bg-paper2 transition-colors hover:border-terra/50"
-        onClick={(e) => { e.preventDefault(); fileRef.current?.click(); }}
+        onClick={(e) => {
+          e.preventDefault();
+          fileRef.current?.click();
+        }}
       >
         <svg viewBox="0 0 24 24" className="h-8 w-8 text-ink/30" fill="none">
           <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
         <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/40">Tambah</span>
       </label>
-      <input ref={fileRef} type="file" accept="image/*" className="hidden"
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }} />
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleFile(f);
+          e.target.value = "";
+        }}
+      />
 
       {cropSrc && (
         <ImageCropper
@@ -255,7 +311,10 @@ function GalleryAddButton({ onAdd }: { onAdd: (blob: Blob) => void }) {
             setCropSrc(null);
             onAdd(blob);
           }}
-          onCancel={() => { URL.revokeObjectURL(cropSrc); setCropSrc(null); }}
+          onCancel={() => {
+            URL.revokeObjectURL(cropSrc);
+            setCropSrc(null);
+          }}
         />
       )}
     </>

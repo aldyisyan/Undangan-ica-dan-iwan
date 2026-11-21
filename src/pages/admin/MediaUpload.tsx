@@ -3,7 +3,7 @@
  * Setelah file dipilih → tampil cropper → setelah konfirmasi → simpan ke IndexedDB.
  */
 import { useRef, useState } from "react";
-import { saveMedia, mediaRef, useMediaSrc } from "../../lib/mediaStore";
+import { saveMedia, removeMedia, isMediaRef, mediaRef, useMediaSrc } from "../../lib/mediaStore";
 import ImageCropper from "./ImageCropper";
 
 export interface MediaUploadProps {
@@ -39,13 +39,12 @@ export default function MediaUpload({
 }: MediaUploadProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
-  const [cropSrc, setCropSrc] = useState<string | null>(null);   // object URL saat cropper terbuka
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const resolvedSrc = useMediaSrc(currentValue);
 
   /* ---- user memilih file ---- */
   const handleFileChosen = (file: File) => {
     if (isAudio) {
-      // audio — langsung simpan tanpa crop
       saveAndEmit(file);
       return;
     }
@@ -67,12 +66,18 @@ export default function MediaUpload({
 
   /* ---- setelah crop dikonfirmasi ---- */
   const handleCropConfirm = async (blob: Blob) => {
-    if (cropSrc) { URL.revokeObjectURL(cropSrc); setCropSrc(null); }
+    if (cropSrc) {
+      URL.revokeObjectURL(cropSrc);
+      setCropSrc(null);
+    }
     await saveAndEmit(blob);
   };
 
   const handleCropCancel = () => {
-    if (cropSrc) { URL.revokeObjectURL(cropSrc); setCropSrc(null); }
+    if (cropSrc) {
+      URL.revokeObjectURL(cropSrc);
+      setCropSrc(null);
+    }
   };
 
   const saveAndEmit = async (data: File | Blob) => {
@@ -83,7 +88,12 @@ export default function MediaUpload({
     setSaving(false);
   };
 
-  const clear = () => onSave("");
+  const clear = async () => {
+    onSave("");
+    if (isMediaRef(currentValue)) {
+      await removeMedia(currentValue.slice(6));
+    }
+  };
 
   return (
     <div className="space-y-3">
@@ -100,7 +110,15 @@ export default function MediaUpload({
           <div className={`${previewClass} relative overflow-hidden ${cropShape === "circle" ? "rounded-full" : ""}`}>
             <img src={resolvedSrc} alt="Preview" className="h-full w-full object-cover" />
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-ink/50 opacity-0 transition-opacity hover:opacity-100">
-              <svg viewBox="0 0 24 24" className="h-6 w-6 text-paper" fill="none"><path d="M15 3h6v6M14 10l6.5-6.5M9 21H3v-6M10 14l-6.5 6.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg viewBox="0 0 24 24" className="h-6 w-6 text-paper" fill="none">
+                <path
+                  d="M15 3h6v6M14 10l6.5-6.5M9 21H3v-6M10 14l-6.5 6.5"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
               <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-paper">Ganti & Crop</span>
             </div>
           </div>
@@ -111,7 +129,15 @@ export default function MediaUpload({
           </div>
         ) : (
           <>
-            <svg viewBox="0 0 24 24" className="h-9 w-9 text-ink/25" fill="none"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12V4M8 8l4-4 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg viewBox="0 0 24 24" className="h-9 w-9 text-ink/25" fill="none">
+              <path
+                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12V4M8 8l4-4 4 4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
             <div className="text-center">
               <p className="text-sm font-semibold text-ink/60">{saving ? "Menyimpan…" : "Klik atau seret file"}</p>
               {!isAudio && <p className="mt-1 text-xs text-ink/35">Akan muncul editor crop setelah dipilih</p>}
@@ -126,7 +152,11 @@ export default function MediaUpload({
         <button type="button" onClick={() => fileRef.current?.click()} className="admin-btn text-[10px]">
           {saving ? "Menyimpan…" : resolvedSrc ? "Ganti File" : "Pilih File"}
         </button>
-        {resolvedSrc && <button type="button" onClick={clear} className="admin-btn-danger text-[10px]">Hapus</button>}
+        {resolvedSrc && (
+          <button type="button" onClick={clear} className="admin-btn-danger text-[10px]">
+            Hapus
+          </button>
+        )}
       </div>
 
       <input ref={fileRef} type="file" accept={accept} className="hidden" onChange={handleChange} />
