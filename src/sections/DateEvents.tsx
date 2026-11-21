@@ -112,7 +112,12 @@ export default function DateEvents() {
   const c = useCountdown(cfg.weddingDate);
 
   const akad = { title: "Akad Nikah", time: cfg.akadTime, place: cfg.akadPlace, note: "Mohon hadir 15 menit lebih awal." };
-  const resepsi = { title: "Resepsi", time: cfg.resepsiTime, place: cfg.resepsiPlace, note: "Dress code: palet sage, nude & terakota." };
+  const resepsi = {
+    title: "Resepsi",
+    time: cfg.resepsiTime,
+    place: cfg.resepsiPlace,
+    note: cfg.resepsiNote || "Dress code: palet sage, nude & terakota.",
+  };
 
   return (
     <>

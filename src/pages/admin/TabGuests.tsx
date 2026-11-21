@@ -259,16 +259,16 @@ export default function TabGuests() {
           <label className="flex cursor-pointer items-center gap-3">
             <button type="button" onClick={() => saveAdminConfig({ globalShowAkad: !cfg.globalShowAkad })}
               role="switch" aria-checked={cfg.globalShowAkad}
-              className={`relative h-6 w-12 rounded-full border-2 transition-all ${cfg.globalShowAkad ? "border-navy bg-navy" : "border-ink/30 bg-ink/10"}`}>
-              <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-paper shadow transition-transform ${cfg.globalShowAkad ? "translate-x-6" : "translate-x-0.5"}`} />
+              className={`relative inline-flex h-6 w-10 items-center rounded-full border-2 transition-all ${cfg.globalShowAkad ? "border-navy bg-navy" : "border-ink/30 bg-ink/10"}`}>
+              <span className={`pointer-events-none h-3.5 w-3.5 rounded-full bg-paper shadow-sm transition-transform duration-300 ${cfg.globalShowAkad ? "translate-x-[1.1rem]" : "translate-x-[0.15rem]"}`} />
             </button>
             <span className="text-sm font-semibold text-ink">Tampilkan Akad Nikah</span>
           </label>
           <label className="flex cursor-pointer items-center gap-3">
             <button type="button" onClick={() => saveAdminConfig({ globalShowResepsi: !cfg.globalShowResepsi })}
               role="switch" aria-checked={cfg.globalShowResepsi}
-              className={`relative h-6 w-12 rounded-full border-2 transition-all ${cfg.globalShowResepsi ? "border-terra bg-terra" : "border-ink/30 bg-ink/10"}`}>
-              <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-paper shadow transition-transform ${cfg.globalShowResepsi ? "translate-x-6" : "translate-x-0.5"}`} />
+              className={`relative inline-flex h-6 w-10 items-center rounded-full border-2 transition-all ${cfg.globalShowResepsi ? "border-terra bg-terra" : "border-ink/30 bg-ink/10"}`}>
+              <span className={`pointer-events-none h-3.5 w-3.5 rounded-full bg-paper shadow-sm transition-transform duration-300 ${cfg.globalShowResepsi ? "translate-x-[1.1rem]" : "translate-x-[0.15rem]"}`} />
             </button>
             <span className="text-sm font-semibold text-ink">Tampilkan Resepsi</span>
           </label>

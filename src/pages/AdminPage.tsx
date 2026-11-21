@@ -9,6 +9,7 @@ import TabGuests from "./admin/TabGuests";
 import TabMedia from "./admin/TabMedia";
 import TabStats from "./admin/TabStats";
 import TabDanger from "./admin/TabDanger";
+import TabDressCode from "./admin/TabDressCode";
 import { HeartDoodle } from "../lib/ui";
 import { useAdminConfig } from "../lib/adminSettings";
 import { getCloudAdmin } from "../lib/cloudConfig";
@@ -16,7 +17,7 @@ import { getLastSyncLabel, useAutoSync } from "../lib/autoSync";
 import { Pill, TabIcon } from "./admin/ui";
 
 type TabId =
-  | "stats" | "settings" | "media" | "sections" | "gifts"
+  | "stats" | "settings" | "media" | "sections" | "dress" | "gifts"
   | "guests" | "wishes" | "cloud" | "danger";
 
 const NAV: { group: string; items: { id: TabId; label: string; icon: string }[] }[] = [
@@ -27,6 +28,7 @@ const NAV: { group: string; items: { id: TabId; label: string; icon: string }[] 
       { id: "settings", label: "Pengaturan Acara", icon: "settings" },
       { id: "media", label: "Media & Foto", icon: "media" },
       { id: "sections", label: "Tampilan Section", icon: "sections" },
+      { id: "dress", label: "Dress Code", icon: "dress" },
       { id: "gifts", label: "Amplop Digital", icon: "gifts" },
     ],
   },
@@ -78,6 +80,7 @@ export default function AdminPage() {
       case "settings": return <TabSettings />;
       case "media": return <TabMedia />;
       case "sections": return <TabSections />;
+      case "dress": return <TabDressCode />;
       case "gifts": return <TabGifts />;
       case "wishes": return <TabWishes />;
       case "guests": return <TabGuests />;

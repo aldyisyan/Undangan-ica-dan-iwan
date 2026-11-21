@@ -67,6 +67,9 @@ async function runSync(): Promise<void> {
   }
 }
 
+/** Re-export for direct usage. */
+export { pullFromCloud } from "./cloud";
+
 /** Paksa sinkron sekarang (dipakai tombol manual). */
 export async function syncNow(): Promise<boolean> {
   const admin = getCloudAdmin();

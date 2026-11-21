@@ -123,12 +123,16 @@ function GalleryItem({
 
         <FrameDecor frame={frame} stamp={stamp} />
 
-        <span className="scrap__cap">
-          <span className="scrap__cap-text">{entry.caption}</span>
-          {(frame === "clip" || frame === "ink") && (
-            <span className="scrap__no">No. {String(idx + 1).padStart(2, "0")}</span>
-          )}
-        </span>
+        {entry.caption ? (
+          <span className="scrap__cap">
+            <span className="scrap__cap-text">{entry.caption}</span>
+            {(frame === "clip" || frame === "ink") && (
+              <span className="scrap__no">No. {String(idx + 1).padStart(2, "0")}</span>
+            )}
+          </span>
+        ) : (
+          <span className="scrap__cap" />
+        )}
       </button>
     </Reveal>
   );
@@ -163,7 +167,7 @@ export default function Gallery() {
   const items = useMemo<GalleryEntry[]>(() => {
     const fb = (i: number) => GALLERY[i % GALLERY.length].src;
     if (configCustom.length > 0) {
-      return configCustom.map((src, i) => ({ src, caption: `Foto ${i + 1}`, ratio: "aspect-[4/5]", fallback: fb(i) }));
+      return configCustom.map((src, i) => ({ src, caption: "", ratio: "aspect-[4/5]", fallback: fb(i) }));
     }
     if (folder.length > 0) return folder;
     return GALLERY.map((g) => ({ src: g.src, caption: g.caption, ratio: g.ratio, fallback: g.src }));

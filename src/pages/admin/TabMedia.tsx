@@ -323,10 +323,10 @@ function ToggleBtn({ value, onChange }: { value: boolean; onChange: (v: boolean)
       onClick={() => onChange(!value)}
       role="switch"
       aria-checked={value}
-      className={`relative h-7 w-14 shrink-0 rounded-full border-2 transition-all duration-300 ${value ? "border-terra bg-terra" : "border-ink/30 bg-ink/10"}`}
+      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border-2 transition-all duration-300 ${value ? "border-terra bg-terra" : "border-ink/30 bg-ink/10"}`}
     >
       <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-paper shadow transition-transform duration-300 ${value ? "translate-x-7" : "translate-x-0.5"}`}
+        className={`pointer-events-none h-[1.15rem] w-[1.15rem] rounded-full bg-paper shadow-sm transition-transform duration-300 ${value ? "translate-x-[1.35rem]" : "translate-x-[0.15rem]"}`}
       />
     </button>
   );

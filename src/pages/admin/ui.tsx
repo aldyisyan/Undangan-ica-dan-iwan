@@ -38,6 +38,14 @@ const PATHS: Record<string, ReactNode> = {
   ),
   wishes: <><rect x="3" y="5.5" width="18" height="13" rx="1.5" /><path d="M3.6 6.6L12 13l8.4-6.4" /></>,
   cloud: <><path d="M6.8 18.5h10.4a4.2 4.2 0 0 0 .6-8.35A6.2 6.2 0 0 0 6.2 9.4a4.6 4.6 0 0 0 .6 9.1z" /></>,
+  dress: (
+    <>
+      <path d="M12 3.2a8.8 8.8 0 1 0 0 17.6c1.1 0 2-.9 2-2 0-.5-.2-1-.6-1.4-.4-.4-.6-.9-.6-1.4 0-1.1.9-2 2-2h2.2A4.8 4.8 0 0 0 21 9.2C21 5.8 17 3.2 12 3.2z" />
+      <circle cx="7.6" cy="11.2" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="10.2" cy="7.3" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="14.6" cy="7.4" r="1.15" fill="currentColor" stroke="none" />
+    </>
+  ),
   danger: <><path d="M12 3.6L21 19.5H3z" /><path d="M12 9.5v4.6M12 16.7h.01" /></>,
 };
 
@@ -203,13 +211,13 @@ export function Toggle({
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className={`relative h-7 w-14 shrink-0 rounded-full border-2 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terra ${
+      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border-2 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terra ${
         checked ? "border-terra bg-terra" : "border-ink/30 bg-ink/10 hover:border-ink/45"
       }`}
     >
       <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-paper shadow transition-transform duration-300 ${
-          checked ? "translate-x-7" : "translate-x-0.5"
+        className={`pointer-events-none h-[1.15rem] w-[1.15rem] rounded-full bg-paper shadow-sm transition-transform duration-300 ${
+          checked ? "translate-x-[1.35rem]" : "translate-x-[0.15rem]"
         }`}
       />
     </button>

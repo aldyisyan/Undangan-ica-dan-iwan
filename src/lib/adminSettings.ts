@@ -87,6 +87,19 @@ export interface AdminConfig {
   /** Visual peta lokasi. Kosong = embed / tombol bawaan. Diisi foto → tampil foto. */
   mapsPhoto: string;
 
+  /** Dress code — seluruh isi section "Palet Tamu" di halaman undangan */
+  dressKicker: string;
+  dressTitle: string;
+  dressAside: string;
+  dressNote: string;
+  dressSwatches: { name: string; hex: string }[];
+  dressMaleDos: string[];
+  dressMaleDont: string;
+  dressFemaleDos: string[];
+  dressFemaleDont: string;
+  /** Catatan kecil pada kartu Resepsi di section Rangkaian Acara */
+  resepsiNote: string;
+
   /** Pesan template WhatsApp undangan */
   waTemplate: string;
 
@@ -152,6 +165,33 @@ const DEFAULT: AdminConfig = {
   closingPhoto: "",
   calendarPhoto: "",
   mapsPhoto: "",
+
+  dressKicker: "Dress Code Suggestions",
+  dressTitle: "Palet Tamu",
+  dressAside: "hangat, netral, senada",
+  dressNote: "Kenakan salah satu warna di atas — atau campuran harmonis di antaranya.",
+  dressSwatches: [
+    { name: "Hitam Pekat", hex: "#1E1B18" },
+    { name: "Sage Olive", hex: "#7D8471" },
+    { name: "Nude Beige", hex: "#E7D3BE" },
+    { name: "Terakota", hex: "#B5533C" },
+  ],
+  dressMaleDos: [
+    "Jas atau blazer navy/boneka dengan kemeja nude atau sage",
+    "Smart casual: kemeja lengan panjang tanpa dasi, celana bahan",
+    "Sepatu kulit cokelat atau hitam, jam tangan sederhana",
+    "Bisa ditambahkan sapu tangan terakota di saku jas",
+  ],
+  dressMaleDont: "Hindari kaos berlogo besar, sandal, dan celana jeans robek.",
+  dressFemaleDos: [
+    "Dress midi atau maxi bernuansa sage, nude, atau terakota",
+    "Kebaya modern & kain senada sangat kami tunggu kehadirannya",
+    "Kerudung atau selendang dengan warna turunan palet di atas",
+    "Flat shoes atau heels rendah — acara berlangsung duduk",
+  ],
+  dressFemaleDont:
+    "Mohon tidak mengenakan pakaian serba putih, karena mempelai wanita mengenakan putih.",
+  resepsiNote: "Dress code: palet sage, nude & terakota.",
 
   waTemplate: `Kepada Yth. {nama}\ndi tempat\n\nAssalamu'alaikum Warahmatullahi Wabarakatuh\n\nTanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara pernikahan kami:\n\n{mempelai}\n{tanggal}\n{lokasi}\n\nUndangan digital khusus untuk Anda dapat dibuka melalui tautan berikut:\n{link}\n\nMerupakan kehormatan bagi kami apabila Anda berkenan hadir.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh`,
 

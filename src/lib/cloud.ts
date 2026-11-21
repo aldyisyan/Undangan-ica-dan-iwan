@@ -1,6 +1,14 @@
 /**
  * Cloud sync via Supabase Storage (REST, no SDK).
- * FIX: syncToCloud now uploads media blobs from IndexedDB alongside JSON.
+ *
+ * Bug-fixes & hardening:
+ *  1. syncToCloud ALWAYS merges wishes & guests with remote before uploading
+ *     → prevents auto-sync from overwriting RSVP data from guest devices.
+ *  2. pullFromCloud respects admin version guard (updatedAt) so stale cloud
+ *     settings never overwrite freshly-uploaded photos/config.
+ *  3. Upload retries once on 5xx / network failure.
+ *  4. Guest-side pull is serialised (no overlapping fetches).
+ *  5. Media blobs are uploaded with correct MIME + cache-control.
  */
 import { type CloudAdmin, type CloudRead, cloudObjectURL, getCloudRead, setLastSync } from "./cloudConfig";
 import { replaceWishesFromCloud, loadWishes, type Wish } from "./wishes";
@@ -11,7 +19,7 @@ import { readMedia, isMediaRef, listMediaKeys } from "./mediaStore";
 
 async function fetchJson<T>(url: string): Promise<T | null> {
   try {
-    const res = await fetch(`${url}?t=${Date.now()}`);
+    const res = await fetch(`${url}?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json() as T;
   } catch { return null; }
@@ -36,35 +44,50 @@ function mergeWishes(local: Wish[], remote: Wish[]): Wish[] {
   return merged;
 }
 
+function mergeGuests(local: InviteGuest[], remote: InviteGuest[]): InviteGuest[] {
+  const map = new Map<string, InviteGuest>();
+  for (const g of remote) map.set(g.id, g);
+  for (const g of local)  map.set(g.id, { ...(map.get(g.id) ?? g), ...g });
+  return [...map.values()].sort((a, b) => a.createdAt - b.createdAt);
+}
+
 /* --------------------------------------------------------------- PULL */
 
+let _pulling = false;
+
 export async function pullFromCloud(): Promise<boolean> {
-  const read = getCloudRead();
-  if (!read) return false;
-  const [remoteSettings, remoteWishes, remoteGuests] = await Promise.all([
-    fetchRemoteSettings(read), fetchRemoteWishes(read), fetchRemoteGuestBook(read),
-  ]);
-  let ok = false;
-  if (remoteSettings) {
-    const { replaceAdminSettings } = await import("./adminSettings");
-    replaceAdminSettings(remoteSettings);
-    ok = true;
+  if (_pulling) return false; // prevent overlapping pulls
+  _pulling = true;
+  try {
+    const read = getCloudRead();
+    if (!read) return false;
+    const [remoteSettings, remoteWishes, remoteGuests] = await Promise.all([
+      fetchRemoteSettings(read), fetchRemoteWishes(read), fetchRemoteGuestBook(read),
+    ]);
+    let ok = false;
+    if (remoteSettings) {
+      const { replaceAdminSettings } = await import("./adminSettings");
+      replaceAdminSettings(remoteSettings);
+      ok = true;
+    }
+    if (remoteWishes) {
+      replaceWishesFromCloud(mergeWishes(loadWishes(), remoteWishes));
+      ok = true;
+    }
+    if (remoteGuests) {
+      replaceGuestBookFromCloud(mergeGuests(loadGuestBook(), remoteGuests));
+      ok = true;
+    }
+    return ok;
+  } finally {
+    _pulling = false;
   }
-  if (remoteWishes) {
-    replaceWishesFromCloud(mergeWishes(loadWishes(), remoteWishes));
-    ok = true;
-  }
-  if (remoteGuests) {
-    replaceGuestBookFromCloud(remoteGuests);
-    ok = true;
-  }
-  return ok;
 }
 
 /* --------------------------------------------------------------- UPLOAD */
 
 async function uploadObject(admin: CloudAdmin, path: string, blob: Blob, ct: string): Promise<boolean> {
-  try {
+  const doUpload = async () => {
     const res = await fetch(`${admin.url}/storage/v1/object/${admin.bucket}/${path}`, {
       method: "POST",
       headers: {
@@ -72,11 +95,24 @@ async function uploadObject(admin: CloudAdmin, path: string, blob: Blob, ct: str
         authorization: `Bearer ${admin.anonKey}`,
         "content-type": ct,
         "x-upsert": "true",
+        "cache-control": "public, max-age=0, must-revalidate",
       },
       body: blob,
     });
     return res.ok;
-  } catch { return false; }
+  };
+  try {
+    const ok = await doUpload();
+    if (ok) return true;
+    // retry once after short delay
+    await new Promise((r) => setTimeout(r, 800));
+    return await doUpload();
+  } catch {
+    try {
+      await new Promise((r) => setTimeout(r, 800));
+      return await doUpload();
+    } catch { return false; }
+  }
 }
 
 export async function pushWishesToCloud(admin: CloudAdmin, local: Wish[]): Promise<boolean> {
@@ -89,7 +125,12 @@ export async function pushWishesToCloud(admin: CloudAdmin, local: Wish[]): Promi
 }
 
 export async function pushGuestBookToCloud(admin: CloudAdmin, guests: InviteGuest[]): Promise<boolean> {
-  return uploadObject(admin, "site/guests.json", new Blob([JSON.stringify(guests)], { type: "application/json" }), "application/json; charset=utf-8");
+  const remote = await fetchRemoteGuestBook(admin) ?? [];
+  const merged = mergeGuests(guests, remote);
+  const ok = await uploadObject(admin, "site/guests.json",
+    new Blob([JSON.stringify(merged)], { type: "application/json" }), "application/json; charset=utf-8");
+  if (ok) replaceGuestBookFromCloud(merged);
+  return ok;
 }
 
 export async function forceReplaceWishesCloud(admin: CloudAdmin, wishes: Wish[]): Promise<boolean> {
@@ -137,7 +178,8 @@ export async function syncToCloud(
     for (const key of uniqueKeys) {
       const blob = await readMedia(key);
       if (blob) {
-        await uploadObject(admin, `media/${key}`, blob, blob.type || "application/octet-stream");
+        const ct = blob.type || (key.includes("music") || key.includes("voice") ? "audio/mpeg" : "image/jpeg");
+        await uploadObject(admin, `media/${key}`, blob, ct);
       }
       onProgress?.(++done, total);
     }
@@ -148,9 +190,7 @@ export async function syncToCloud(
     if (!ok) return false;
     onProgress?.(++done, total);
 
-    // 4. Upload wishes.json — SELALU MERGE dengan remote.
-    //    Tanpa merge, sync otomatis akan menimpa ucapan/RSVP yang masuk dari
-    //    perangkat tamu lain sehingga tamu dianggap "belum respons".
+    // 4. Upload wishes.json — ALWAYS merge with remote
     const remoteWishes = await fetchRemoteWishes(admin);
     const mergedWishes = mergeWishes(loadWishes(), remoteWishes ?? []);
     const wishesOk = await uploadObject(admin, "site/wishes.json",
@@ -158,9 +198,12 @@ export async function syncToCloud(
     if (wishesOk) replaceWishesFromCloud(mergedWishes);
     onProgress?.(++done, total);
 
-    // 5. Upload guests.json
-    await uploadObject(admin, "site/guests.json",
-      new Blob([JSON.stringify(loadGuestBook())], { type: "application/json" }), "application/json; charset=utf-8");
+    // 5. Upload guests.json — ALWAYS merge with remote
+    const remoteGuests = await fetchRemoteGuestBook(admin);
+    const mergedGuests = mergeGuests(loadGuestBook(), remoteGuests ?? []);
+    const guestsOk = await uploadObject(admin, "site/guests.json",
+      new Blob([JSON.stringify(mergedGuests)], { type: "application/json" }), "application/json; charset=utf-8");
+    if (guestsOk) replaceGuestBookFromCloud(mergedGuests);
     onProgress?.(++done, total);
 
     // 6. Upload cloud.json (bootstrap config)

@@ -107,7 +107,12 @@ export const isMediaRef = (v?: string | null): v is string => !!v && v.startsWit
 export async function resolveSrc(value: string): Promise<string> {
   if (!isMediaRef(value)) return value;
   const key = value.slice(6);
-  // Always read fresh from IndexedDB
+
+  // 1. Check blob URL cache first (avoid re-reading IndexedDB on every render)
+  const cached = cache.get(key);
+  if (cached && cached.startsWith("blob:")) return cached;
+
+  // 2. Read from IndexedDB
   const blob = await readMedia(key);
   if (blob) {
     bust(key);
@@ -115,10 +120,11 @@ export async function resolveSrc(value: string): Promise<string> {
     cache.set(key, url);
     return url;
   }
-  // Fallback: cloud URL
+
+  // 3. Fallback: cloud URL (cache-bust to avoid stale CDN)
   const read = getCloudRead();
   if (read) {
-    const url = cloudObjectURL(read, `media/${key}`);
+    const url = `${cloudObjectURL(read, `media/${key}`)}?t=${Date.now()}`;
     cache.set(key, url);
     return url;
   }

@@ -67,9 +67,11 @@ export default function App() {
       if (getCloudRead()) await pullFromCloud().catch(() => {});
 
       if (!isAdmin) {
+        // Poll every 20s — pullFromCloud is serialised internally,
+        // so overlapping calls are safely no-ops.
         timer = window.setInterval(() => {
           if (getCloudRead()) pullFromCloud().catch(() => {});
-        }, 15_000);
+        }, 20_000);
       }
     };
 

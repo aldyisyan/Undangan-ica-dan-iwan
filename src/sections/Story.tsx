@@ -69,6 +69,7 @@ export default function Story({
   showDressCode?: boolean;
 }) {
   void showDressCode; // suppress unused warning, used in JSX below
+  const cfg = useAdminConfig();
   return (
     <>
       {/* ------------------------------------------------- 05 · cerita */}
@@ -149,15 +150,15 @@ export default function Story({
         <div className={WRAP}>
           <SectionHead
             num="06"
-            kicker="Dress Code Suggestions"
-            title="Palet Tamu"
-            aside="hangat, netral, senada"
+            kicker={cfg.dressKicker || "Dress Code Suggestions"}
+            title={cfg.dressTitle || "Palet Tamu"}
+            aside={cfg.dressAside || "hangat, netral, senada"}
           />
 
           <Reveal className="mt-14">
             <div className="flex flex-wrap items-start justify-center gap-8 sm:gap-12">
-              {DRESS_SWATCHES.map((s) => (
-                <div key={s.hex} className="flex w-28 flex-col items-center text-center">
+              {(cfg.dressSwatches.length > 0 ? cfg.dressSwatches : DRESS_SWATCHES).map((s) => (
+                <div key={`${s.hex}-${s.name}`} className="flex w-28 flex-col items-center text-center">
                   <div className="relative h-20 w-20">
                     <span
                       className="absolute inset-0 rounded-full"
@@ -187,41 +188,35 @@ export default function Story({
             </div>
           </Reveal>
 
-          <div className="mx-auto mt-6 max-w-xl text-center">
-            <Reveal delay={80}>
-              <p className="font-note text-sm leading-relaxed text-terra">
-                Kenakan salah satu warna di atas &mdash; atau campuran harmonis di antaranya.
-              </p>
-            </Reveal>
-          </div>
+          {cfg.dressNote && (
+            <div className="mx-auto mt-6 max-w-xl text-center">
+              <Reveal delay={80}>
+                <p className="font-note text-sm leading-relaxed text-terra">{cfg.dressNote}</p>
+              </Reveal>
+            </div>
+          )}
 
           <div className="mt-14 grid gap-8 md:grid-cols-2 md:gap-10">
-            <Reveal delay={60}>
-              <GuideCard
-                title="Untuk Pria"
-                rotate="md:-rotate-[0.6deg]"
-                doList={[
-                  "Jas atau blazer navy/boneka dengan kemeja nude atau sage",
-                  "Smart casual: kemeja lengan panjang tanpa dasi, celana bahan",
-                  "Sepatu kulit cokelat atau hitam, jam tangan sederhana",
-                  "Bisa ditambahkan sapu tangan terakota di saku jas",
-                ]}
-                dont="Hindari kaos berlogo besar, sandal, dan celana jeans robek."
-              />
-            </Reveal>
-            <Reveal delay={180}>
-              <GuideCard
-                title="Untuk Wanita"
-                rotate="md:rotate-[0.6deg]"
-                doList={[
-                  "Dress midi atau maxi bernuansa sage, nude, atau terakota",
-                  "Kebaya modern & kain senada sangat kami tunggu kehadirannya",
-                  "Kerudung atau selendang dengan warna turunan palet di atas",
-                  "Flat shoes atau heels rendah &mdash; acara berlangsung duduk",
-                ]}
-                dont="Mohon tidak mengenakan pakaian serba putih, karena mempelai wanita mengenakan putih."
-              />
-            </Reveal>
+            {cfg.dressMaleDos.filter((t) => t.trim()).length > 0 && (
+              <Reveal delay={60}>
+                <GuideCard
+                  title="Untuk Pria"
+                  rotate="md:-rotate-[0.6deg]"
+                  doList={cfg.dressMaleDos.filter((t) => t.trim())}
+                  dont={cfg.dressMaleDont}
+                />
+              </Reveal>
+            )}
+            {cfg.dressFemaleDos.filter((t) => t.trim()).length > 0 && (
+              <Reveal delay={180}>
+                <GuideCard
+                  title="Untuk Wanita"
+                  rotate="md:rotate-[0.6deg]"
+                  doList={cfg.dressFemaleDos.filter((t) => t.trim())}
+                  dont={cfg.dressFemaleDont}
+                />
+              </Reveal>
+            )}
           </div>
         </div>
       </section>}
